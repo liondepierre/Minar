@@ -30,8 +30,34 @@ public final class PrayerService: @unchecked Sendable {
         return schedule
     }
 
+    private let cityAliases: [String: String] = [
+        "copenhagen": "kopenhag",
+        "københavn": "kopenhag",
+        "vienna": "viyana",
+        "rome": "roma",
+        "cologne": "koln",
+        "munich": "munih",
+        "athens": "atina",
+        "damascus": "sam",
+        "jerusalem": "kudus",
+        "geneva": "cenevre",
+        "zurich": "zurih",
+        "warsaw": "varsova",
+        "prague": "prag",
+        "moscow": "moskova",
+        "brussels": "bruksel",
+        "baghdad": "bagdat",
+        "beirut": "beyrut",
+        "cairo": "kahire",
+        "mecca": "mekke",
+        "makkah": "mekke",
+        "medina": "medine"
+    ]
+
     private func fetchOfficialDiyanet(city: String, country: String) async throws -> PrayerSchedule? {
-        guard let encodedCity = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+        let cleanCity = city.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let resolvedCity = cityAliases[cleanCity] ?? cleanCity
+        guard let encodedCity = resolvedCity.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let searchUrl = URL(string: "https://ezanvakti.imsakiyem.com/api/locations/search/districts?q=\(encodedCity)") else {
             return nil
         }
