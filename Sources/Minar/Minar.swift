@@ -211,6 +211,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        // About Minar
+        let aboutItem = NSMenuItem(title: "About Minar...", action: #selector(didSelectAbout), keyEquivalent: "")
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
         // Quit
         let quitItem = NSMenuItem(title: "Quit Minar", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
@@ -219,6 +224,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Actions
+
+    @objc private func didSelectAbout() {
+        let alert = NSAlert()
+        alert.messageText = "Minar (مَنَارَة) — v1.0.0"
+        alert.informativeText = "Lightweight, battery-friendly macOS menu bar app for Islamic prayer times.\n\nPure native Swift, zero tracking, authentic calculation sources.\n\nCreated by YMA."
+        alert.alertStyle = .informational
+        if let icon = NSImage(named: "AppIcon") {
+            alert.icon = icon
+        }
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
 
     @objc private func didSelectMethod(_ sender: NSMenuItem) {
         guard let selected = sender.representedObject as? CalculationMethod else { return }
