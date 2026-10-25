@@ -30,6 +30,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private var namingStyle: PrayerNamingStyle {
+        get {
+            let saved = UserDefaults.standard.string(forKey: "minar_naming_style") ?? "turkish"
+            return PrayerNamingStyle(rawValue: saved) ?? .turkish
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: "minar_naming_style")
+        }
+    }
+
     private var launchAtLogin: Bool {
         get { SMAppService.mainApp.status == .enabled }
         set {
@@ -134,7 +144,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let h = next.remainingMinutes / 60
             let m = next.remainingMinutes % 60
             let timeRemaining = h > 0 ? "\(h)h \(m)m" : "\(m)m"
-            statusItem.button?.title = "🕌 \(next.item.prayer.turkishName) \(next.item.time) (\(timeRemaining))"
+            statusItem.button?.title = "🕌 \(next.item.prayer.displayName(style: namingStyle)) \(next.item.time) (\(timeRemaining))"
 
             // Rebuild the menu only when the highlighted prayer changes (e.g. Dhuhr → Asr)
             if next.item.prayer != lastHighlightedPrayer {
@@ -167,7 +177,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let isNext = (nextItem?.prayer == item.prayer)
             let prefix = isNext ? "👉 " : "    "
             let indicator = isNext ? " (Next)" : ""
-            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, item.prayer.turkishName, item.prayer.rawValue, item.time, indicator)
+            let primary = item.prayer.displayName(style: namingStyle)
+            let secondary = (namingStyle == .turkish) ? item.prayer.rawValue : item.prayer.turkishName
+            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, primary, secondary, item.time, indicator)
 
             let menuItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             if isNext {
@@ -192,6 +204,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let methodParent = NSMenuItem(title: "Calculation Method", action: nil, keyEquivalent: "")
         methodParent.submenu = methodMenu
         menu.addItem(methodParent)
+
+        // Prayer Names Submenu
+        let namesMenu = NSMenu()
+        for style in PrayerNamingStyle.allCases {
+            let nItem = NSMenuItem(title: style.title, action: #selector(didSelectNamingStyle(_:)), keyEquivalent: "")
+            nItem.target = self
+            nItem.representedObject = style
+            nItem.state = (style == self.namingStyle) ? .on : .off
+            namesMenu.addItem(nItem)
+        }
+        let namesParent = NSMenuItem(title: "Prayer Names", action: nil, keyEquivalent: "")
+        namesParent.submenu = namesMenu
+        menu.addItem(namesParent)
 
         // Change Location Item
         let changeLocItem = NSMenuItem(title: "Change City / Country...", action: #selector(didSelectChangeLocation), keyEquivalent: "l")
@@ -241,6 +266,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let selected = sender.representedObject as? CalculationMethod else { return }
         self.method = selected
         fetchTimings()
+    }
+
+    @objc private func didSelectNamingStyle(_ sender: NSMenuItem) {
+        guard let selected = sender.representedObject as? PrayerNamingStyle else { return }
+        self.namingStyle = selected
+        updateStatusBarText()
+        rebuildMenu()
     }
 
     @objc private func didToggleLaunchAtLogin() {

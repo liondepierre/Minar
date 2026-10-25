@@ -20,6 +20,20 @@ public enum CalculationMethod: Int, CaseIterable, Identifiable, Codable {
     }
 }
 
+public enum PrayerNamingStyle: String, CaseIterable, Identifiable, Codable {
+    case turkish = "turkish"
+    case arabic = "arabic"
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .turkish: return "Turkish (İmsak, Öğle...)"
+        case .arabic: return "Arabic / Latin (Fajr, Dhuhr...)"
+        }
+    }
+}
+
 public enum Prayer: String, CaseIterable, Identifiable, Codable {
     case fajr = "Fajr"
     case sunrise = "Sunrise"
@@ -38,6 +52,13 @@ public enum Prayer: String, CaseIterable, Identifiable, Codable {
         case .asr: return "İkindi"
         case .maghrib: return "Akşam"
         case .isha: return "Yatsı"
+        }
+    }
+
+    public func displayName(style: PrayerNamingStyle) -> String {
+        switch style {
+        case .turkish: return turkishName
+        case .arabic: return rawValue
         }
     }
 }
