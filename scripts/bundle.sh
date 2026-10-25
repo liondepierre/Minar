@@ -35,8 +35,6 @@ cat << 'EOF' > "$APP_DIR/Contents/Info.plist"
     <string>1.0</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
-    <key>LSUIElement</key>
-    <true/>
 </dict>
 </plist>
 EOF
@@ -55,7 +53,9 @@ fi
 DMG_TEMP="/tmp/minar_temp_$$.dmg"
 rm -f "$DMG_TEMP"
 hdiutil create -size 60m -volname "Minar" -fs HFS+ -ov "$DMG_TEMP" > /dev/null
-MOUNT_DIR=$(hdiutil attach "$DMG_TEMP" -nobrowse -noverify -noautoopen | grep -E '/Volumes/' | awk '{print $NF}')
+ATTACH_OUTPUT=$(hdiutil attach "$DMG_TEMP" -nobrowse -noverify -noautoopen)
+DISK_DEV=$(echo "$ATTACH_OUTPUT" | awk '/\/Volumes\// {print $1}')
+MOUNT_DIR=$(echo "$ATTACH_OUTPUT" | sed -n 's/.*\(\/Volumes\/.*\)/\1/p')
 
 cp -R "$APP_DIR" "$MOUNT_DIR/"
 ln -s /Applications "$MOUNT_DIR/Applications"
@@ -64,9 +64,9 @@ cp Resources/dmg_background.png "$MOUNT_DIR/.background/background.png"
 chflags hidden "$MOUNT_DIR/.background"
 
 # Style the Finder window to compact 540x340 Navy theme
-osascript -e '
-tell application "Finder"
-  tell disk "Minar"
+osascript -e "
+tell application \"Finder\"
+  tell disk \"$(basename "$MOUNT_DIR")\"
     open
     set current view of container window to icon view
     set toolbar visible of container window to false
@@ -75,21 +75,22 @@ tell application "Finder"
     set viewOptions to the icon view options of container window
     set arrangement of viewOptions to not arranged
     set icon size of viewOptions to 84
-    set background picture of viewOptions to file ".background:background.png"
-    set position of item "Minar.app" of container window to {135, 170}
-    set position of item "Applications" of container window to {405, 170}
+    set background picture of viewOptions to file \".background:background.png\"
+    set position of item \"Minar.app\" of container window to {135, 170}
+    set position of item \"Applications\" of container window to {405, 170}
     try
-      set position of item ".background" of container window to {1500, 1500}
+      set position of item \".background\" of container window to {1500, 1500}
     end try
     update without registering applications
     delay 1
     close
   end tell
-end tell' > /dev/null 2>&1 || true
+end tell" > /dev/null 2>&1 || true
 
 sync
+sleep 2
+hdiutil detach "$DISK_DEV" -force > /dev/null 2>&1 || true
 sleep 1
-hdiutil detach "$MOUNT_DIR" > /dev/null 2>&1 || true
 
 rm -f build/Minar.dmg
 hdiutil convert "$DMG_TEMP" -format UDZO -imagekey zlib-level=9 -o build/Minar.dmg > /dev/null
