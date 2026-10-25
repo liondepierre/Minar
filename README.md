@@ -62,6 +62,7 @@ Requires Xcode Command Line Tools (`xcode-select --install`).
 | See next prayer & countdown | Glance at the menu bar |
 | See all today's times | Click the 🕌 icon |
 | Change prayer naming (Turkish / Arabic) | Menu → **Prayer Names** |
+| Check for new version | Menu → **Check for Updates...** |
 | Change city / country | Menu → **Change City / Country...** |
 | Change calculation method | Menu → **Calculation Method** |
 | Force refresh | Menu → **Refresh Now** |

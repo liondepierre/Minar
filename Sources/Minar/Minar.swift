@@ -7,6 +7,7 @@ import ServiceManagement
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var displayTimer: Timer?
+    private let appVersion = "1.0.4"
 
     private var city: String {
         get { UserDefaults.standard.string(forKey: "minar_city") ?? UserDefaults.standard.string(forKey: "adhan_city") ?? "Tokyo" }
@@ -240,6 +241,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        // Check for Updates
+        let updateItem = NSMenuItem(title: "Check for Updates...", action: #selector(didSelectCheckForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
+
         // About Minar
         let aboutItem = NSMenuItem(title: "About Minar...", action: #selector(didSelectAbout), keyEquivalent: "")
         aboutItem.target = self
@@ -256,7 +262,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func didSelectAbout() {
         let alert = NSAlert()
-        alert.messageText = "Minar (مَنَارَة) — v1.0.3"
+        alert.messageText = "Minar (مَنَارَة) — v\(appVersion)"
         alert.informativeText = "Lightweight, battery-friendly macOS menu bar app for Islamic prayer times.\n\nPure native Swift, zero tracking, authentic calculation sources.\n\nCreated by YMA."
         alert.alertStyle = .informational
         if let icon = NSImage(named: "AppIcon") {
@@ -264,6 +270,62 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         alert.addButton(withTitle: "OK")
         alert.runModal()
+    }
+
+    @objc private func didSelectCheckForUpdates() {
+        Task { [weak self] in
+            guard let self = self else { return }
+            let url = URL(string: "https://api.github.com/repos/liondepierre/Minar/releases/latest")!
+            var req = URLRequest(url: url)
+            req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+            req.setValue("Minar-macOS", forHTTPHeaderField: "User-Agent")
+
+            do {
+                let (data, response) = try await URLSession.shared.data(for: req)
+                guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                    self.showUpdateAlert(title: "Unable to Check for Updates", message: "Could not reach GitHub Releases. Please check your network.", downloadURL: nil)
+                    return
+                }
+                struct GHRelease: Codable {
+                    let tag_name: String
+                    let html_url: String
+                }
+                let release = try JSONDecoder().decode(GHRelease.self, from: data)
+                let latestTag = release.tag_name.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
+                if latestTag.compare(self.appVersion, options: .numeric) == .orderedDescending {
+                    self.showUpdateAlert(
+                        title: "Update Available!",
+                        message: "A new version of Minar (v\(latestTag)) is available. You are running v\(self.appVersion).",
+                        downloadURL: URL(string: release.html_url)
+                    )
+                } else {
+                    self.showUpdateAlert(
+                        title: "You're Up to Date",
+                        message: "Minar v\(self.appVersion) is currently the newest version available.",
+                        downloadURL: nil
+                    )
+                }
+            } catch {
+                self.showUpdateAlert(title: "Unable to Check for Updates", message: "\(error.localizedDescription)", downloadURL: nil)
+            }
+        }
+    }
+
+    private func showUpdateAlert(title: String, message: String, downloadURL: URL?) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .informational
+        if let downloadURL = downloadURL {
+            alert.addButton(withTitle: "Download Update")
+            alert.addButton(withTitle: "Later")
+            if alert.runModal() == .alertFirstButtonReturn {
+                NSWorkspace.shared.open(downloadURL)
+            }
+        } else {
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
     }
 
     @objc private func didSelectMethod(_ sender: NSMenuItem) {
