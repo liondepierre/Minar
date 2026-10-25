@@ -61,8 +61,9 @@ cp -R "$APP_DIR" "$MOUNT_DIR/"
 ln -s /Applications "$MOUNT_DIR/Applications"
 mkdir -p "$MOUNT_DIR/.background"
 cp Resources/dmg_background.png "$MOUNT_DIR/.background/background.png"
+chflags hidden "$MOUNT_DIR/.background"
 
-# Style the Finder window to match app theme
+# Style the Finder window to compact 540x340 Navy theme
 osascript -e '
 tell application "Finder"
   tell disk "Minar"
@@ -70,13 +71,13 @@ tell application "Finder"
     set current view of container window to icon view
     set toolbar visible of container window to false
     set statusbar visible of container window to false
-    set the bounds of container window to {400, 200, 1060, 600}
+    set the bounds of container window to {450, 220, 990, 560}
     set viewOptions to the icon view options of container window
     set arrangement of viewOptions to not arranged
-    set icon size of viewOptions to 112
+    set icon size of viewOptions to 84
     set background picture of viewOptions to file ".background:background.png"
-    set position of item "Minar.app" of container window to {160, 210}
-    set position of item "Applications" of container window to {500, 210}
+    set position of item "Minar.app" of container window to {135, 175}
+    set position of item "Applications" of container window to {405, 175}
     update without registering applications
     delay 1
     close
