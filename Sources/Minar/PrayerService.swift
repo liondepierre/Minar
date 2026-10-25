@@ -40,15 +40,19 @@ public final class PrayerService: @unchecked Sendable {
         let search = try JSONDecoder().decode(DistrictSearchResponse.self, from: searchData)
         guard let district = search.data.first else { return nil }
 
-        guard let timesUrl = URL(string: "https://ezanvakti.imsakiyem.com/api/prayer-times/\(district._id)/daily") else {
+        guard let timesUrl = URL(string: "https://ezanvakti.imsakiyem.com/api/prayer-times/\(district._id)") else {
             return nil
         }
 
         let (timesData, _) = try await URLSession.shared.data(from: timesUrl)
         let res = try JSONDecoder().decode(DiyanetTimesResponse.self, from: timesData)
-        guard let day = res.data.first else { return nil }
 
         let now = Date()
+        let dfToday = DateFormatter()
+        dfToday.dateFormat = "yyyy-MM-dd"
+        let todayStr = dfToday.string(from: now)
+
+        guard let day = res.data.first(where: { $0.date.hasPrefix(todayStr) }) ?? res.data.first else { return nil }
         let t = day.times
         let mapping: [(Prayer, String)] = [
             (.fajr, t.imsak),
