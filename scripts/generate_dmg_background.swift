@@ -16,71 +16,51 @@ ctx.setShouldAntialias(true)
 
 let colorSpace = CGColorSpaceCreateDeviceRGB()
 
-// 1. Rich Navy Dark Blue Background Gradient
+// 1. Rich Navy Dark Blue Background Gradient (Only background, clean and sleek)
 let bgColors = [
-    NSColor(srgbRed: 0.05, green: 0.12, blue: 0.25, alpha: 1.0).cgColor, // Rich Navy
-    NSColor(srgbRed: 0.02, green: 0.06, blue: 0.14, alpha: 1.0).cgColor  // Deep Navy base
+    NSColor(srgbRed: 0.05, green: 0.12, blue: 0.25, alpha: 1.0).cgColor, // Top Rich Navy
+    NSColor(srgbRed: 0.02, green: 0.06, blue: 0.14, alpha: 1.0).cgColor  // Bottom Deep Navy
 ] as CFArray
 if let bgGradient = CGGradient(colorsSpace: colorSpace, colors: bgColors, locations: [0.0, 1.0]) {
     ctx.drawLinearGradient(bgGradient, start: CGPoint(x: width / 2, y: height), end: CGPoint(x: width / 2, y: 0), options: [])
 }
 
-// 2. Ambient Navy Radial Glow in upper center
+// 2. Ambient Navy Radial Glow in Center
 let glowColors = [
-    NSColor(srgbRed: 0.12, green: 0.24, blue: 0.48, alpha: 0.40).cgColor,
+    NSColor(srgbRed: 0.12, green: 0.24, blue: 0.48, alpha: 0.45).cgColor,
     NSColor(srgbRed: 0.05, green: 0.12, blue: 0.25, alpha: 0.0).cgColor
 ] as CFArray
 if let glowGrad = CGGradient(colorsSpace: colorSpace, colors: glowColors, locations: [0.0, 1.0]) {
-    ctx.drawRadialGradient(glowGrad, startCenter: CGPoint(x: width / 2, y: height * 0.65), startRadius: 0, endCenter: CGPoint(x: width / 2, y: height * 0.65), endRadius: 220, options: [.drawsAfterEndLocation])
+    ctx.drawRadialGradient(glowGrad, startCenter: CGPoint(x: width / 2, y: height * 0.55), startRadius: 0, endCenter: CGPoint(x: width / 2, y: height * 0.55), endRadius: 220, options: [.drawsAfterEndLocation])
 }
 
-// 3. Subtle Arch contour (Minar theme)
+// 3. Subtle Arch silhouette (Minar motif)
 let archPath = CGMutablePath()
-let archRect = CGRect(x: width / 2 - 100, y: 60, width: 200, height: 180)
-archPath.addRoundedRect(in: archRect, cornerWidth: 100, cornerHeight: 100)
+let archRect = CGRect(x: width / 2 - 90, y: 70, width: 180, height: 160)
+archPath.addRoundedRect(in: archRect, cornerWidth: 90, cornerHeight: 90)
 ctx.saveGState()
 ctx.setLineWidth(1.0)
-ctx.setStrokeColor(NSColor(srgbRed: 0.85, green: 0.72, blue: 0.40, alpha: 0.12).cgColor)
+ctx.setStrokeColor(NSColor(srgbRed: 0.85, green: 0.72, blue: 0.40, alpha: 0.10).cgColor)
 ctx.addPath(archPath)
 ctx.strokePath()
 ctx.restoreGState()
 
-// 4. Central Arrow between App and Applications folder
+// 4. Subtle Minimalist Arrow between the two icon spots
 let arrowCenter = CGPoint(x: width / 2, y: 165)
-let arrowFont = NSFont.systemFont(ofSize: 26, weight: .light)
+let arrowFont = NSFont.systemFont(ofSize: 24, weight: .light)
 let arrowAttrs: [NSAttributedString.Key: Any] = [
     .font: arrowFont,
-    .foregroundColor: NSColor(srgbRed: 0.90, green: 0.76, blue: 0.40, alpha: 0.80)
+    .foregroundColor: NSColor(srgbRed: 0.90, green: 0.76, blue: 0.40, alpha: 0.75)
 ]
 let arrowStr = NSAttributedString(string: "➔", attributes: arrowAttrs)
 let arrowSize = arrowStr.size()
 arrowStr.draw(at: CGPoint(x: arrowCenter.x - arrowSize.width / 2, y: arrowCenter.y - arrowSize.height / 2))
 
-// 5. Header: "Minar" Title
-let titleFont = NSFont.systemFont(ofSize: 22, weight: .bold)
-let titleAttrs: [NSAttributedString.Key: Any] = [
-    .font: titleFont,
-    .foregroundColor: NSColor(srgbRed: 0.95, green: 0.96, blue: 0.98, alpha: 0.95)
-]
-let titleStr = NSAttributedString(string: "Minar", attributes: titleAttrs)
-let titleSize = titleStr.size()
-titleStr.draw(at: CGPoint(x: width / 2 - titleSize.width / 2, y: height - 50))
-
-// 6. Subtitle: "Drag to Applications to install"
-let subFont = NSFont.systemFont(ofSize: 12, weight: .medium)
-let subAttrs: [NSAttributedString.Key: Any] = [
-    .font: subFont,
-    .foregroundColor: NSColor(srgbRed: 0.65, green: 0.75, blue: 0.90, alpha: 0.80)
-]
-let subStr = NSAttributedString(string: "Drag to Applications to install", attributes: subAttrs)
-let subSize = subStr.size()
-subStr.draw(at: CGPoint(x: width / 2 - subSize.width / 2, y: height - 72))
-
-// 7. Outer subtle glass edge
+// 5. Outer glass border stroke
 let borderRect = CGRect(x: 1, y: 1, width: width - 2, height: height - 2)
 let borderPath = NSBezierPath(rect: borderRect)
 borderPath.lineWidth = 1
-NSColor(calibratedWhite: 1.0, alpha: 0.12).setStroke()
+NSColor(calibratedWhite: 1.0, alpha: 0.10).setStroke()
 borderPath.stroke()
 
 image.unlockFocus()
@@ -93,4 +73,4 @@ guard let tiff = image.tiffRepresentation,
 
 let outPath = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "Resources/dmg_background.png"
 try png.write(to: URL(fileURLWithPath: outPath))
-print("Generated Navy Blue DMG background at \(outPath)")
+print("Generated clean textless Navy DMG background at \(outPath)")

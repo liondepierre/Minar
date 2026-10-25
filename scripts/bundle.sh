@@ -76,8 +76,11 @@ tell application "Finder"
     set arrangement of viewOptions to not arranged
     set icon size of viewOptions to 84
     set background picture of viewOptions to file ".background:background.png"
-    set position of item "Minar.app" of container window to {135, 175}
-    set position of item "Applications" of container window to {405, 175}
+    set position of item "Minar.app" of container window to {135, 170}
+    set position of item "Applications" of container window to {405, 170}
+    try
+      set position of item ".background" of container window to {1500, 1500}
+    end try
     update without registering applications
     delay 1
     close
