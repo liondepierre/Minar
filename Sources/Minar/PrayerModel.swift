@@ -55,6 +55,17 @@ public enum Prayer: String, CaseIterable, Identifiable, Codable {
         }
     }
 
+    public var arabicScript: String {
+        switch self {
+        case .fajr: return "الفجر"
+        case .sunrise: return "الشروق"
+        case .dhuhr: return "الظهر"
+        case .asr: return "العصر"
+        case .maghrib: return "المغرب"
+        case .isha: return "العشاء"
+        }
+    }
+
     public func displayName(style: PrayerNamingStyle) -> String {
         switch style {
         case .turkish: return turkishName

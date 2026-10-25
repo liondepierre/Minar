@@ -173,13 +173,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         // Prayer Times List
+        let now = Date()
+        let isPastIsha = schedule.items.allSatisfy { $0.date <= now }
         for item in schedule.items {
             let isNext = (nextItem?.prayer == item.prayer)
             let prefix = isNext ? "👉 " : "    "
-            let indicator = isNext ? " (Next)" : ""
+            let indicator = isNext ? (isPastIsha ? " (Tomorrow)" : " (Next)") : ""
+            let displayTime = (isNext && isPastIsha && schedule.tomorrowFajr != nil) ? schedule.tomorrowFajr!.time : item.time
+
             let primary = item.prayer.displayName(style: namingStyle)
-            let secondary = (namingStyle == .turkish) ? item.prayer.rawValue : item.prayer.turkishName
-            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, primary, secondary, item.time, indicator)
+            let secondary = (namingStyle == .turkish) ? item.prayer.rawValue : item.prayer.arabicScript
+            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, primary, secondary, displayTime, indicator)
 
             let menuItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             if isNext {
@@ -252,7 +256,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func didSelectAbout() {
         let alert = NSAlert()
-        alert.messageText = "Minar (مَنَارَة) — v1.0.2"
+        alert.messageText = "Minar (مَنَارَة) — v1.0.3"
         alert.informativeText = "Lightweight, battery-friendly macOS menu bar app for Islamic prayer times.\n\nPure native Swift, zero tracking, authentic calculation sources.\n\nCreated by YMA."
         alert.alertStyle = .informational
         if let icon = NSImage(named: "AppIcon") {
