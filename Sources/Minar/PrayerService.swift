@@ -93,6 +93,18 @@ public final class PrayerService: @unchecked Sendable {
             PrayerItem(prayer: prayer, time: timeStr, date: parseTime(timeStr, today: now))
         }
 
+        // Exact tomorrow's Fajr from the same monthly response (zero extra network calls)
+        var tomorrowFajrItem: PrayerItem? = nil
+        let calendar = Calendar.current
+        if let tomorrowDate = calendar.date(byAdding: .day, value: 1, to: now) {
+            let tomorrowStr = dfToday.string(from: tomorrowDate)
+            if let tomorrowDay = res.data.first(where: { $0.date.hasPrefix(tomorrowStr) }) {
+                let tTime = tomorrowDay.times.imsak
+                let tDate = parseTime(tTime, today: tomorrowDate, calendar: calendar)
+                tomorrowFajrItem = PrayerItem(prayer: .fajr, time: tTime, date: tDate)
+            }
+        }
+
         let df = DateFormatter()
         df.dateStyle = .medium
         let gregorian = df.string(from: now)
@@ -103,7 +115,8 @@ public final class PrayerService: @unchecked Sendable {
             method: .diyanet,
             hijriDate: "\(day.hijri_date.full_date) AH",
             gregorianDate: gregorian,
-            items: items
+            items: items,
+            tomorrowFajr: tomorrowFajrItem
         )
     }
 

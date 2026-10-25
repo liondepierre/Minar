@@ -252,7 +252,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func didSelectAbout() {
         let alert = NSAlert()
-        alert.messageText = "Minar (مَنَارَة) — v1.0.1"
+        alert.messageText = "Minar (مَنَارَة) — v1.0.2"
         alert.informativeText = "Lightweight, battery-friendly macOS menu bar app for Islamic prayer times.\n\nPure native Swift, zero tracking, authentic calculation sources.\n\nCreated by YMA."
         alert.alertStyle = .informational
         if let icon = NSImage(named: "AppIcon") {

@@ -77,6 +77,25 @@ public struct PrayerSchedule: Codable {
     public let hijriDate: String
     public let gregorianDate: String
     public let items: [PrayerItem]
+    public let tomorrowFajr: PrayerItem?
+
+    public init(
+        city: String,
+        country: String,
+        method: CalculationMethod,
+        hijriDate: String,
+        gregorianDate: String,
+        items: [PrayerItem],
+        tomorrowFajr: PrayerItem? = nil
+    ) {
+        self.city = city
+        self.country = country
+        self.method = method
+        self.hijriDate = hijriDate
+        self.gregorianDate = gregorianDate
+        self.items = items
+        self.tomorrowFajr = tomorrowFajr
+    }
 
     public func nextPrayer(at now: Date = Date()) -> (item: PrayerItem, remainingMinutes: Int)? {
         for item in items {
@@ -86,10 +105,15 @@ public struct PrayerSchedule: Codable {
             }
         }
         // Past Isha: next is tomorrow's Fajr
+        if let tomorrow = tomorrowFajr {
+            let diff = max(0, Int(tomorrow.date.timeIntervalSince(now) / 60))
+            return (tomorrow, diff)
+        }
+        // Fallback if tomorrow not available
         if let first = items.first(where: { $0.prayer == .fajr }) {
-            let tomorrowFajr = Calendar.current.date(byAdding: .day, value: 1, to: first.date) ?? first.date
-            let diff = max(0, Int(tomorrowFajr.timeIntervalSince(now) / 60))
-            return (PrayerItem(prayer: .fajr, time: first.time, date: tomorrowFajr), diff)
+            let tomorrowFajrDate = Calendar.current.date(byAdding: .day, value: 1, to: first.date) ?? first.date
+            let diff = max(0, Int(tomorrowFajrDate.timeIntervalSince(now) / 60))
+            return (PrayerItem(prayer: .fajr, time: first.time, date: tomorrowFajrDate), diff)
         }
         return nil
     }
