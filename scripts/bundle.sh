@@ -44,8 +44,53 @@ EOF
 echo "Signing app with local ad-hoc certificate..."
 codesign --force --deep -s - "$APP_DIR"
 
-echo "Creating distribution zip for sharing..."
+echo "Creating distribution zip..."
 (cd build && rm -f Minar.zip && zip -rq Minar.zip Minar.app)
+
+echo "Generating themed DMG installer..."
+if [ ! -f "Resources/dmg_background.png" ]; then
+    swift scripts/generate_dmg_background.swift
+fi
+
+DMG_TEMP="/tmp/minar_temp_$$.dmg"
+rm -f "$DMG_TEMP"
+hdiutil create -size 60m -volname "Minar" -fs HFS+ -ov "$DMG_TEMP" > /dev/null
+MOUNT_DIR=$(hdiutil attach "$DMG_TEMP" -nobrowse -noverify -noautoopen | grep -E '/Volumes/' | awk '{print $NF}')
+
+cp -R "$APP_DIR" "$MOUNT_DIR/"
+ln -s /Applications "$MOUNT_DIR/Applications"
+mkdir -p "$MOUNT_DIR/.background"
+cp Resources/dmg_background.png "$MOUNT_DIR/.background/background.png"
+
+# Style the Finder window to match app theme
+osascript -e '
+tell application "Finder"
+  tell disk "Minar"
+    open
+    set current view of container window to icon view
+    set toolbar visible of container window to false
+    set statusbar visible of container window to false
+    set the bounds of container window to {400, 200, 1060, 600}
+    set viewOptions to the icon view options of container window
+    set arrangement of viewOptions to not arranged
+    set icon size of viewOptions to 112
+    set background picture of viewOptions to file ".background:background.png"
+    set position of item "Minar.app" of container window to {160, 210}
+    set position of item "Applications" of container window to {500, 210}
+    update without registering applications
+    delay 1
+    close
+  end tell
+end tell' > /dev/null 2>&1 || true
+
+sync
+sleep 1
+hdiutil detach "$MOUNT_DIR" > /dev/null 2>&1 || true
+
+rm -f build/Minar.dmg
+hdiutil convert "$DMG_TEMP" -format UDZO -imagekey zlib-level=9 -o build/Minar.dmg > /dev/null
+rm -f "$DMG_TEMP"
 
 echo "Done! App built: $APP_DIR"
 echo "Distribution archive: build/Minar.zip"
+echo "Distribution disk image: build/Minar.dmg"

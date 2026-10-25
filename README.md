@@ -31,11 +31,11 @@
 
 ## Installation
 
-### Option A — Download the pre-built app
+### Option A — Download the pre-built app (Recommended)
 
-1. Download **`Minar.zip`** from the [Releases](../../releases) page.
-2. Unzip and move **`Minar.app`** to your `/Applications` folder.
-3. Double-click to open. If macOS blocks it: **System Settings → Privacy & Security → Open Anyway**.
+1. Download **`Minar.dmg`** from the [Releases](../../releases) page.
+2. Double-click **`Minar.dmg`** and drag **`Minar`** into your **Applications** folder.
+3. Open **Minar** from Applications or Spotlight. If macOS blocks first launch: **System Settings → Privacy & Security → Open Anyway**.
 4. The 🕌 icon appears in your menu bar immediately.
 
 > **Tip:** First launch will ask for the city and country. Type any city name (e.g. `Tokyo`, `London`, `Istanbul`).
