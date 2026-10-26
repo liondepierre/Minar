@@ -89,6 +89,9 @@ public struct PrayerSchedule: Codable {
     public let gregorianDate: String
     public let items: [PrayerItem]
     public let tomorrowFajr: PrayerItem?
+    public let tomorrowItems: [PrayerItem]?
+    public let tomorrowGregorianDate: String?
+    public let tomorrowHijriDate: String?
 
     public init(
         city: String,
@@ -97,7 +100,10 @@ public struct PrayerSchedule: Codable {
         hijriDate: String,
         gregorianDate: String,
         items: [PrayerItem],
-        tomorrowFajr: PrayerItem? = nil
+        tomorrowFajr: PrayerItem? = nil,
+        tomorrowItems: [PrayerItem]? = nil,
+        tomorrowGregorianDate: String? = nil,
+        tomorrowHijriDate: String? = nil
     ) {
         self.city = city
         self.country = country
@@ -105,7 +111,14 @@ public struct PrayerSchedule: Codable {
         self.hijriDate = hijriDate
         self.gregorianDate = gregorianDate
         self.items = items
-        self.tomorrowFajr = tomorrowFajr
+        self.tomorrowItems = tomorrowItems
+        self.tomorrowGregorianDate = tomorrowGregorianDate
+        self.tomorrowHijriDate = tomorrowHijriDate
+        self.tomorrowFajr = tomorrowFajr ?? tomorrowItems?.first(where: { $0.prayer == .fajr })
+    }
+
+    public func isPastIsha(at now: Date = Date()) -> Bool {
+        items.allSatisfy { $0.date <= now }
     }
 
     public func nextPrayer(at now: Date = Date()) -> (item: PrayerItem, remainingMinutes: Int)? {
@@ -116,7 +129,8 @@ public struct PrayerSchedule: Codable {
             }
         }
         // Past Isha: next is tomorrow's Fajr
-        if let tomorrow = tomorrowFajr {
+        let tFajr = tomorrowFajr ?? tomorrowItems?.first(where: { $0.prayer == .fajr })
+        if let tomorrow = tFajr {
             let diff = max(0, Int(tomorrow.date.timeIntervalSince(now) / 60))
             return (tomorrow, diff)
         }

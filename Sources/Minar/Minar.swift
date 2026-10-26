@@ -7,7 +7,7 @@ import ServiceManagement
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var displayTimer: Timer?
-    private let appVersion = "1.0.4"
+    private let appVersion = "1.0.5"
 
     private var city: String {
         get { UserDefaults.standard.string(forKey: "minar_city") ?? UserDefaults.standard.string(forKey: "adhan_city") ?? "Tokyo" }
@@ -73,6 +73,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         fetchTimings()
         scheduleNextTick()
+
+        // Wake from sleep: immediately re-evaluate status bar & prayer transition
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.tick()
+            }
+        }
     }
 
     // MARK: - Smart Timer
@@ -159,7 +170,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func rebuildMenu() {
         guard let schedule = currentSchedule else { return }
-        let nextItem = schedule.nextPrayer()?.item
+        let now = Date()
+        let isPastIsha = schedule.isPastIsha(at: now)
+        let nextItem = schedule.nextPrayer(at: now)?.item
         let menu = NSMenu()
 
         // Header: Location & Dates
@@ -167,24 +180,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         locItem.isEnabled = false
         menu.addItem(locItem)
 
-        let dateItem = NSMenuItem(title: "📅 \(schedule.gregorianDate)  •  \(schedule.hijriDate)", action: nil, keyEquivalent: "")
+        let dateTitle: String
+        if isPastIsha, let tGreg = schedule.tomorrowGregorianDate {
+            let hijriPart = schedule.tomorrowHijriDate.map { "  •  \($0)" } ?? ""
+            dateTitle = "📅 Tomorrow: \(tGreg)\(hijriPart)"
+        } else {
+            dateTitle = "📅 \(schedule.gregorianDate)  •  \(schedule.hijriDate)"
+        }
+        let dateItem = NSMenuItem(title: dateTitle, action: nil, keyEquivalent: "")
         dateItem.isEnabled = false
         menu.addItem(dateItem)
 
         menu.addItem(NSMenuItem.separator())
 
         // Prayer Times List
-        let now = Date()
-        let isPastIsha = schedule.items.allSatisfy { $0.date <= now }
-        for item in schedule.items {
+        let displayItems = (isPastIsha && schedule.tomorrowItems != nil) ? schedule.tomorrowItems! : schedule.items
+        for item in displayItems {
             let isNext = (nextItem?.prayer == item.prayer)
             let prefix = isNext ? "👉 " : "    "
-            let indicator = isNext ? (isPastIsha ? " (Tomorrow)" : " (Next)") : ""
-            let displayTime = (isNext && isPastIsha && schedule.tomorrowFajr != nil) ? schedule.tomorrowFajr!.time : item.time
+            let indicator = isNext ? " (Next)" : ""
 
             let primary = item.prayer.displayName(style: namingStyle)
             let secondary = (namingStyle == .turkish) ? item.prayer.rawValue : item.prayer.arabicScript
-            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, primary, secondary, displayTime, indicator)
+            let title = String(format: "%@%-7@ (%-7@)  %@%@", prefix, primary, secondary, item.time, indicator)
 
             let menuItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             if isNext {

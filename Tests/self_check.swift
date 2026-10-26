@@ -43,6 +43,23 @@ func runChecks() async {
             assert(timeRegex.firstMatch(in: t, range: range) != nil, "\(key) has invalid format: \(t)")
         }
         print("✔ Check passed: Diyanet API live, Istanbul prayer times present and well-formed")
+
+        // Check 4: Verify monthly endpoint has tomorrow data
+        let monthlyUrl = URL(string: "https://ezanvakti.imsakiyem.com/api/prayer-times/\(districtId)")!
+        let (monthData, _) = try await URLSession.shared.data(from: monthlyUrl)
+        let monthJson = try JSONSerialization.jsonObject(with: monthData) as? [String: Any]
+        let monthDays = monthJson?["data"] as? [[String: Any]]
+        assert((monthDays?.count ?? 0) >= 28, "Monthly endpoint must return full month array")
+
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
+        let tomorrowStr = df.string(from: tomorrow)
+        let tomorrowDay = monthDays?.first(where: { ($0["date"] as? String)?.hasPrefix(tomorrowStr) == true })
+        assert(tomorrowDay != nil, "Tomorrow day data must be found in monthly endpoint")
+        let tomorrowTimes = tomorrowDay?["times"] as? [String: String]
+        assert(tomorrowTimes?["imsak"] != nil, "Tomorrow imsak time must be present")
+        print("✔ Check passed: Monthly endpoint provides tomorrow prayer schedule (imsak: \(tomorrowTimes!["imsak"]!))")
     } catch {
         fatalError("Network check failed: \(error)")
     }

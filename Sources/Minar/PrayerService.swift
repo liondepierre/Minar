@@ -93,15 +93,33 @@ public final class PrayerService: @unchecked Sendable {
             PrayerItem(prayer: prayer, time: timeStr, date: parseTime(timeStr, today: now))
         }
 
-        // Exact tomorrow's Fajr from the same monthly response (zero extra network calls)
+        // Extract tomorrow's full schedule from the same monthly response (zero extra network calls)
+        var tomorrowItems: [PrayerItem]? = nil
+        var tomorrowGregorian: String? = nil
+        var tomorrowHijri: String? = nil
         var tomorrowFajrItem: PrayerItem? = nil
+
         let calendar = Calendar.current
         if let tomorrowDate = calendar.date(byAdding: .day, value: 1, to: now) {
             let tomorrowStr = dfToday.string(from: tomorrowDate)
             if let tomorrowDay = res.data.first(where: { $0.date.hasPrefix(tomorrowStr) }) {
-                let tTime = tomorrowDay.times.imsak
-                let tDate = parseTime(tTime, today: tomorrowDate, calendar: calendar)
-                tomorrowFajrItem = PrayerItem(prayer: .fajr, time: tTime, date: tDate)
+                let tt = tomorrowDay.times
+                let tomorrowMapping: [(Prayer, String)] = [
+                    (.fajr, tt.imsak),
+                    (.sunrise, tt.gunes),
+                    (.dhuhr, tt.ogle),
+                    (.asr, tt.ikindi),
+                    (.maghrib, tt.aksam),
+                    (.isha, tt.yatsi)
+                ]
+                tomorrowItems = tomorrowMapping.map { prayer, timeStr in
+                    PrayerItem(prayer: prayer, time: timeStr, date: parseTime(timeStr, today: tomorrowDate, calendar: calendar))
+                }
+                tomorrowFajrItem = tomorrowItems?.first(where: { $0.prayer == .fajr })
+                let df = DateFormatter()
+                df.dateStyle = .medium
+                tomorrowGregorian = df.string(from: tomorrowDate)
+                tomorrowHijri = "\(tomorrowDay.hijri_date.full_date) AH"
             }
         }
 
@@ -116,7 +134,10 @@ public final class PrayerService: @unchecked Sendable {
             hijriDate: "\(day.hijri_date.full_date) AH",
             gregorianDate: gregorian,
             items: items,
-            tomorrowFajr: tomorrowFajrItem
+            tomorrowFajr: tomorrowFajrItem,
+            tomorrowItems: tomorrowItems,
+            tomorrowGregorianDate: tomorrowGregorian,
+            tomorrowHijriDate: tomorrowHijri
         )
     }
 
@@ -144,6 +165,19 @@ public final class PrayerService: @unchecked Sendable {
             }
         }
 
+        let calendar = Calendar.current
+        var tomorrowItems: [PrayerItem]? = nil
+        var tomorrowGregorian: String? = nil
+        if let tomorrowDate = calendar.date(byAdding: .day, value: 1, to: now) {
+            let df = DateFormatter()
+            df.dateStyle = .medium
+            tomorrowGregorian = df.string(from: tomorrowDate)
+            tomorrowItems = items.compactMap { item in
+                guard let tDate = calendar.date(byAdding: .day, value: 1, to: item.date) else { return nil }
+                return PrayerItem(prayer: item.prayer, time: item.time, date: tDate)
+            }
+        }
+
         let hijri = "\(root.data.date.hijri.day) \(root.data.date.hijri.month.en) \(root.data.date.hijri.year) AH"
         return PrayerSchedule(
             city: city,
@@ -151,7 +185,11 @@ public final class PrayerService: @unchecked Sendable {
             method: method,
             hijriDate: hijri,
             gregorianDate: root.data.date.readable,
-            items: items
+            items: items,
+            tomorrowFajr: tomorrowItems?.first(where: { $0.prayer == .fajr }),
+            tomorrowItems: tomorrowItems,
+            tomorrowGregorianDate: tomorrowGregorian,
+            tomorrowHijriDate: nil
         )
     }
 
