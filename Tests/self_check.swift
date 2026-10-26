@@ -60,6 +60,20 @@ func runChecks() async {
         let tomorrowTimes = tomorrowDay?["times"] as? [String: String]
         assert(tomorrowTimes?["imsak"] != nil, "Tomorrow imsak time must be present")
         print("✔ Check passed: Monthly endpoint provides tomorrow prayer schedule (imsak: \(tomorrowTimes!["imsak"]!))")
+
+        // Check 5: Non-Diyanet methods (AlAdhan API: MWL, ISNA, Makkah, Egypt)
+        let nonDiyanet = [(name: "MWL", id: 3), (name: "ISNA", id: 2), (name: "Makkah", id: 4), (name: "Egypt", id: 5)]
+        for m in nonDiyanet {
+            let adhanUrl = URL(string: "https://api.aladhan.com/v1/timingsByCity?city=London&country=UK&method=\(m.id)")!
+            let (aData, aRes) = try await URLSession.shared.data(from: adhanUrl)
+            assert((aRes as? HTTPURLResponse)?.statusCode == 200, "AlAdhan method \(m.name) must return 200")
+            let aJson = try JSONSerialization.jsonObject(with: aData) as? [String: Any]
+            let aTimings = (aJson?["data"] as? [String: Any])?["timings"] as? [String: String]
+            for p in ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] {
+                assert(aTimings?[p] != nil, "AlAdhan \(m.name) missing prayer \(p)")
+            }
+        }
+        print("✔ Check passed: All 4 non-Diyanet methods live & verified (MWL, ISNA, Makkah, Egypt)")
     } catch {
         fatalError("Network check failed: \(error)")
     }
