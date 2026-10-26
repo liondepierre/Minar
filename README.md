@@ -1,6 +1,19 @@
-# Minar — Prayer Times for macOS Menu Bar
+<div align="center">
+
+<img src="Resources/AppIcon-compressed.png" width="120" height="120" alt="Minar App Icon" />
+
+# Minar (مَنَارَة)
+### Prayer Times for macOS Menu Bar
 
 **Minar** is a lightweight, battery-optimised macOS menu bar app that shows Islamic prayer times (Salah times) with a live countdown — always visible, never in your way.
+
+<br/>
+
+<img src="Resources/app-screenshot.png" width="640" alt="Minar Menu Bar Screenshot" />
+
+<br/>
+
+</div>
 
 > Built for Muslims who use a Mac and want accurate prayer times without opening a browser or a heavy app.
 
@@ -43,8 +56,8 @@
 ### Option B — Build from source
 
 ```bash
-git clone https://github.com/yourusername/minar.git
-cd minar
+git clone https://github.com/liondepierre/Minar.git
+cd Minar
 swift build -c release
 # Or build a signed universal .app bundle:
 ./scripts/bundle.sh
