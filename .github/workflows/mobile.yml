@@ -1,0 +1,32 @@
+name: Mobile CI
+
+on:
+  push:
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/mobile.yml'
+    branches: [ main ]
+    tags: [ 'mobile-v*' ]
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Install dependencies & run tests
+        run: |
+          cd apps/mobile
+          flutter pub get
+          flutter test
+      - name: Build Android APK
+        run: |
+          cd apps/mobile
+          flutter build apk --debug

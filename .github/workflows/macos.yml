@@ -1,0 +1,23 @@
+name: macOS Menu Bar CI
+
+on:
+  push:
+    paths:
+      - 'apps/macos-menubar/**'
+      - '.github/workflows/macos.yml'
+    branches: [ main ]
+    tags: [ 'macos-v*' ]
+  pull_request:
+    paths:
+      - 'apps/macos-menubar/**'
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build macOS App
+        run: |
+          cd apps/macos-menubar
+          swift build -c release
