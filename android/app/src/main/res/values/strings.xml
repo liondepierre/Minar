@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Minar</string>
+    <string name="widget_next_prayer_name">Minar Next Prayer</string>
+    <string name="widget_next_prayer_desc">Shows the upcoming prayer time with live countdown.</string>
+    <string name="widget_timetable_name">Minar Daily Timetable</string>
+    <string name="widget_timetable_desc">Shows all 6 daily prayer times with active salah highlight.</string>
+    <string name="widget_vertical_name">Minar Vertical Schedule</string>
+    <string name="widget_vertical_desc">Vertical table of prayer times like the in-app home screen.</string>
+    <string name="widget_bar_name">Minar Minimal Bar</string>
+    <string name="widget_bar_desc">Compact single-line horizontal prayer bar.</string>
+</resources>

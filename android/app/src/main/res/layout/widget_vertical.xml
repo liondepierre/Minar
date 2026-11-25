@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_vertical_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_card_bg"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/widget_v_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Ikast, Denmark"
+            android:textColor="#E8C582"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_v_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="26 Nov • 16 Jumādá"
+            android:textColor="#7E8EA6"
+            android:textSize="12.5sp" />
+    </LinearLayout>
+
+    <!-- 6 Vertical Rows -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Row 0: Fajr -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_0"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_0"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_gold" />
+
+            <TextView
+                android:id="@+id/widget_v_name_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="İmsak"
+                android:textColor="#E8C582"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Fajr"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="06:05"
+                android:textColor="#F4DC9F"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#16233B" />
+
+        <!-- Row 1: Sunrise -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_1"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_dim" />
+
+            <TextView
+                android:id="@+id/widget_v_name_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Güneş"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Sunrise"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:15"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#16233B" />
+
+        <!-- Row 2: Dhuhr -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_2"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_dim" />
+
+            <TextView
+                android:id="@+id/widget_v_name_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Öğle"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Dhuhr"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:16"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#16233B" />
+
+        <!-- Row 3: Asr -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_3"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_dim" />
+
+            <TextView
+                android:id="@+id/widget_v_name_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="İkindi"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Asr"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="13:47"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#16233B" />
+
+        <!-- Row 4: Maghrib -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_4"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_dim" />
+
+            <TextView
+                android:id="@+id/widget_v_name_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Akşam"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Maghrib"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:06"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#16233B" />
+
+        <!-- Row 5: Isha -->
+        <LinearLayout
+            android:id="@+id/widget_v_row_5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
+
+            <ImageView
+                android:id="@+id/widget_v_dot_5"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/widget_dot_dim" />
+
+            <TextView
+                android:id="@+id/widget_v_name_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yatsı"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_v_sub_5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Isha"
+                android:textColor="#7E8EA6"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_v_time_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="18:08"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
