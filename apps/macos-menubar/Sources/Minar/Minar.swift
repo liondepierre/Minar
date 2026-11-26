@@ -373,7 +373,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func didSelectChangeLocation() {
         let alert = NSAlert()
         alert.messageText = "Set Prayer Location"
-        alert.informativeText = "Enter City and Country (e.g. Istanbul, Turkey or Ikast, Denmark):"
+        alert.informativeText = "Enter City and Country (e.g. Tokyo, Japan or Istanbul, Turkey):"
         alert.alertStyle = .informational
         alert.addButton(withTitle: "Save")
         alert.addButton(withTitle: "Cancel")
@@ -381,11 +381,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let container = NSView(frame: NSRect(x: 0, y: 0, width: 260, height: 60))
         let cityField = NSTextField(frame: NSRect(x: 0, y: 32, width: 260, height: 24))
         cityField.stringValue = self.city
-        cityField.placeholderString = "City (e.g. Ikast)"
+        cityField.placeholderString = "City (e.g. Tokyo)"
 
         let countryField = NSTextField(frame: NSRect(x: 0, y: 4, width: 260, height: 24))
         countryField.stringValue = self.country
-        countryField.placeholderString = "Country (e.g. Denmark)"
+        countryField.placeholderString = "Country (e.g. Japan)"
 
         container.addSubview(cityField)
         container.addSubview(countryField)

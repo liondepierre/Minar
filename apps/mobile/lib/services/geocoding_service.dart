@@ -24,7 +24,7 @@ class GeocodingService {
     return input.trim().replaceAll(RegExp(r'\s+'), ' ');
   }
 
-  /// Rejects punctuation/gibberish like "Ikast ..dew.de." or digits.
+  /// Rejects punctuation/gibberish like "Tokyo ..dew.de." or digits.
   static bool isValidPlaceName(String input) {
     final clean = sanitize(input);
     if (clean.length < 2 || clean.length > 60) return false;
