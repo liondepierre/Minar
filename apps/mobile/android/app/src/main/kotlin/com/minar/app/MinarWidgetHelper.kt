@@ -105,6 +105,11 @@ object MinarWidgetHelper {
         }
     }
 
+    // Timetable/Bar cells are too small for font scaling — cap at 1.0 to prevent overflow
+    private fun getTextScaleCapped(json: JSONObject, max: Float = 1.0f): Float {
+        return getTextScale(json).coerceAtMost(max)
+    }
+
     fun saveAndBroadcastData(context: Context, data: Map<String, Any?>) {
         val json = JSONObject(data)
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -170,7 +175,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScale(json)
+                val scale = getTextScaleCapped(json, 1.15f)  // Cap: Next Prayer layout has limited space
 
                 views.setInt(R.id.widget_next_prayer_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_next_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -228,7 +233,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScale(json)
+                val scale = getTextScaleCapped(json, 1.0f)  // Cap: Timetable 2x3 cells overflow with large font
 
                 views.setInt(R.id.widget_timetable_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_tt_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -300,7 +305,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScale(json)
+                val scale = getTextScaleCapped(json, 1.15f)  // Cap: Vertical rows have fixed height
 
                 views.setInt(R.id.widget_vertical_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_v_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -391,7 +396,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScale(json)
+                val scale = getTextScaleCapped(json, 1.0f)  // Cap: Bar cells are too small to scale
 
                 views.setInt(R.id.widget_bar_root, "setBackgroundResource", style.bgRes)
 

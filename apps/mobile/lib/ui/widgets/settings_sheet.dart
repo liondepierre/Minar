@@ -1283,16 +1283,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
-                      const Text(
-                        'Fast, privacy-focused prayer timetable with offline calculations and native home screen widgets.',
-                        style: TextStyle(
-                          color: MinarTheme.textSecondary,
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -1307,7 +1298,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
@@ -1540,7 +1531,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
-            child: const Text('Awesome', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
