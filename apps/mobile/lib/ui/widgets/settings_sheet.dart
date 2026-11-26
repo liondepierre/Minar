@@ -1,7 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
+
+const String kAppVersion = '1.1.0';
+const int kAppBuild = 2;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -1286,7 +1292,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 ),
                                 SizedBox(height: 3),
                                 Text(
-                                  'Version 1.0.0 (Build 1) • Open Source',
+                                  'Version $kAppVersion (Build $kAppBuild) • Open Source',
                                   style: TextStyle(
                                     color: MinarTheme.textSecondary,
                                     fontSize: 12,
@@ -1498,63 +1504,226 @@ class _SettingsSheetState extends State<SettingsSheet> {
     );
   }
 
-  void _checkForUpdates(BuildContext context) {
+  bool _isVersionNewer(String latest, String current) {
+    try {
+      final lParts = latest.split('.').map((p) => int.tryParse(p) ?? 0).toList();
+      final cParts = current.split('.').map((p) => int.tryParse(p) ?? 0).toList();
+      for (int i = 0; i < 3; i++) {
+        final l = i < lParts.length ? lParts[i] : 0;
+        final c = i < cParts.length ? cParts[i] : 0;
+        if (l > c) return true;
+        if (l < c) return false;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  Future<void> _openUrl(String url) async {
+    try {
+      const channel = MethodChannel('com.minar.app/system');
+      await channel.invokeMethod('openUrl', {'url': url});
+    } catch (_) {}
+  }
+
+  void _showUpdateErrorDialog(BuildContext context, String error) {
     showDialog(
       context: context,
-      builder: (ctx) => MediaQuery(
-        data: MediaQuery.of(ctx).copyWith(
-          textScaler: TextScaler.linear(widget.controller.zoomEnhanced ? 1.25 : 1.0),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: MinarTheme.surfaceSolid,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: MinarTheme.borderFaint),
         ),
-        child: AlertDialog(
-          backgroundColor: MinarTheme.surfaceSolid,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: MinarTheme.borderFaint),
+        title: const Text('Update Check Failed',
+            style: TextStyle(color: MinarTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Text(
+          '$error\n\nYou can manually check releases at:\ngithub.com/liondepierre/Minar/releases',
+          style: const TextStyle(color: MinarTheme.textSecondary, fontSize: 12.5, height: 1.45),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _openUrl('https://github.com/liondepierre/Minar/releases');
+            },
+            style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
+            child: const Text('Open GitHub'),
           ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: MinarTheme.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(10),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(foregroundColor: MinarTheme.textSecondary),
+            child: const Text('Dismiss'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _checkForUpdates(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Center(
+        child: Card(
+          color: MinarTheme.surfaceSolid,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(MinarTheme.goldWarm),
+                  ),
                 ),
-                child: const Icon(Icons.check_circle_outline_rounded,
-                    color: Colors.greenAccent, size: 22),
-              ),
-              const SizedBox(width: 12),
-              const Text('Up to Date',
-                  style: TextStyle(
-                      color: MinarTheme.textPrimary,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Minar v1.1.0 (Build 2) is currently the latest release.',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
-              SizedBox(height: 10),
-              Text(
-                """• Local Diyanet & AlAdhan timing engine active
-• 4 native home screen widgets synchronized
-• Battery-efficient offline timetable loaded
-• GitHub: liondepierre/Minar""",
-                style: TextStyle(color: MinarTheme.textSecondary, fontSize: 12, height: 1.45),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
+                SizedBox(width: 16),
+                Text('Checking GitHub...',
+                    style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
+
+    try {
+      final res = await http
+          .get(
+            Uri.parse('https://api.github.com/repos/liondepierre/Minar/releases/latest'),
+            headers: {'Accept': 'application/vnd.github.v3+json'},
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
+
+      if (res.statusCode == 200) {
+        final json = jsonDecode(res.body) as Map<String, dynamic>;
+        final latestTag = (json['tag_name'] as String? ?? '').replaceFirst('v', '').trim();
+        final releaseUrl = json['html_url'] as String? ?? 'https://github.com/liondepierre/Minar/releases';
+        final body = json['body'] as String? ?? '';
+
+        String? apkUrl;
+        final assets = json['assets'] as List<dynamic>?;
+        if (assets != null) {
+          for (final a in assets) {
+            final name = (a['name'] as String? ?? '').toLowerCase();
+            if (name.endsWith('.apk')) {
+              apkUrl = a['browser_download_url'] as String?;
+              break;
+            }
+          }
+        }
+
+        final isNewer = _isVersionNewer(latestTag, kAppVersion);
+
+        if (!context.mounted) return;
+
+        showDialog(
+          context: context,
+          builder: (ctx) => MediaQuery(
+            data: MediaQuery.of(ctx).copyWith(
+              textScaler: TextScaler.linear(widget.controller.zoomEnhanced ? 1.25 : 1.0),
+            ),
+            child: AlertDialog(
+              backgroundColor: MinarTheme.surfaceSolid,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: const BorderSide(color: MinarTheme.borderFaint),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: MinarTheme.surfaceSubtle,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      isNewer
+                          ? Icons.system_update_rounded
+                          : Icons.check_circle_outline_rounded,
+                      color: isNewer ? MinarTheme.goldWarm : Colors.greenAccent,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    isNewer ? 'Update Available' : 'Up to Date',
+                    style: const TextStyle(
+                      color: MinarTheme.textPrimary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isNewer
+                        ? 'Minar v$latestTag is available (you have v$kAppVersion).'
+                        : 'Minar v$kAppVersion is currently the latest release.',
+                    style: const TextStyle(
+                      color: MinarTheme.textPrimary,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isNewer && body.isNotEmpty
+                        ? (body.length > 250 ? '${body.substring(0, 250)}...' : body)
+                        : """• Local Diyanet & AlAdhan timing engine active
+• 4 native home screen widgets synchronized
+• Battery-efficient offline timetable loaded
+• GitHub: liondepierre/Minar""",
+                    style: const TextStyle(
+                      color: MinarTheme.textSecondary,
+                      fontSize: 12,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                if (isNewer && apkUrl != null)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _openUrl(apkUrl!);
+                    },
+                    style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
+                    child: const Text('Download APK', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (isNewer) {
+                      _openUrl(releaseUrl);
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: isNewer ? MinarTheme.textSecondary : MinarTheme.goldWarm,
+                  ),
+                  child: Text(isNewer ? 'Later' : 'OK', style: const TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        _showUpdateErrorDialog(context, 'GitHub API returned status ${res.statusCode}');
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
+      _showUpdateErrorDialog(context, 'Could not reach GitHub. Check your internet connection.');
+    }
   }
 }

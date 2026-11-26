@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
@@ -162,6 +163,27 @@ class MainActivity : FlutterActivity() {
                         result.success(true)
                     } else {
                         result.error("INVALID_ARGS", "Missing widget arguments", null)
+                    }
+                } else {
+                    result.notImplemented()
+                }
+            }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.minar.app/system")
+            .setMethodCallHandler { call, result ->
+                if (call.method == "openUrl") {
+                    val url = call.argument<String>("url")
+                    if (url != null) {
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(intent)
+                            result.success(true)
+                        } catch (e: Exception) {
+                            result.error("ACTIVITY_FAILED", e.message, null)
+                        }
+                    } else {
+                        result.error("INVALID_ARGS", "Missing url", null)
                     }
                 } else {
                     result.notImplemented()
