@@ -97,19 +97,6 @@ object MinarWidgetHelper {
         )
     }
 
-    private fun getTextScale(json: JSONObject): Float {
-        return when (json.optString("widgetTextSize", "standard")) {
-            "xlarge" -> 1.30f
-            "large" -> 1.15f
-            else -> 1.0f
-        }
-    }
-
-    // Timetable/Bar cells are too small for font scaling — cap at 1.0 to prevent overflow
-    private fun getTextScaleCapped(json: JSONObject, max: Float = 1.0f): Float {
-        return getTextScale(json).coerceAtMost(max)
-    }
-
     fun saveAndBroadcastData(context: Context, data: Map<String, Any?>) {
         val json = JSONObject(data)
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -175,7 +162,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScaleCapped(json, 1.15f)  // Cap: Next Prayer layout has limited space
+                val textSizeMode = json.optString("widgetTextSize", "standard")
 
                 views.setInt(R.id.widget_next_prayer_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_next_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -187,31 +174,44 @@ object MinarWidgetHelper {
                 val nextRemaining = json.optString("nextRemaining", "")
                 val isTomorrow = json.optBoolean("isTomorrowFajr", false)
 
+                // Shorten hijri date for clean header fit
+                val shortHijri = if (hijri.isNotEmpty()) {
+                    val parts = hijri.split(" ")
+                    if (parts.size >= 2) "${parts[0]} ${parts[1]}" else hijri
+                } else ""
+
                 views.setTextViewText(R.id.widget_next_city, "Minar • $city")
                 views.setTextColor(R.id.widget_next_city, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_city, TypedValue.COMPLEX_UNIT_SP, 12f * scale)
+                views.setTextViewTextSize(R.id.widget_next_city, TypedValue.COMPLEX_UNIT_SP, 11f)
 
-                views.setTextViewText(R.id.widget_next_hijri, hijri)
-                views.setTextViewTextSize(R.id.widget_next_hijri, TypedValue.COMPLEX_UNIT_SP, 10.5f * scale)
+                views.setTextViewText(R.id.widget_next_hijri, shortHijri)
+                views.setTextViewTextSize(R.id.widget_next_hijri, TypedValue.COMPLEX_UNIT_SP, 10f)
 
                 views.setTextViewText(R.id.widget_next_name, nextName.uppercase())
                 views.setTextColor(R.id.widget_next_name, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_name, TypedValue.COMPLEX_UNIT_SP, 20f * scale)
+                views.setTextViewTextSize(R.id.widget_next_name, TypedValue.COMPLEX_UNIT_SP, 15f)
 
+                // 28sp / 30sp / 32sp: always fits in 2x2 widget width without clipping last digit
+                val timeSize = when (textSizeMode) {
+                    "xlarge" -> 32f
+                    "large" -> 30f
+                    else -> 28f
+                }
                 views.setTextViewText(R.id.widget_next_time, nextTime)
-                views.setTextViewTextSize(R.id.widget_next_time, TypedValue.COMPLEX_UNIT_SP, 44f * scale)
+                views.setTextViewTextSize(R.id.widget_next_time, TypedValue.COMPLEX_UNIT_SP, timeSize)
+                views.setTextColor(R.id.widget_next_time, 0xFFFFFFFF.toInt())
 
                 val badgeText = if (isTomorrow) "TOMORROW" else "NEXT"
                 views.setTextViewText(R.id.widget_next_badge, badgeText)
                 views.setInt(R.id.widget_next_badge, "setBackgroundResource", style.accent.pillRes)
                 views.setTextColor(R.id.widget_next_badge, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_badge, TypedValue.COMPLEX_UNIT_SP, 9f * scale)
+                views.setTextViewTextSize(R.id.widget_next_badge, TypedValue.COMPLEX_UNIT_SP, 8.5f)
 
                 if (nextRemaining.isNotEmpty()) {
                     views.setTextViewText(R.id.widget_next_remaining, "in $nextRemaining")
                     views.setInt(R.id.widget_next_remaining_container, "setBackgroundResource", style.accent.pillRes)
                     views.setTextColor(R.id.widget_next_remaining, style.accent.accentLightColor)
-                    views.setTextViewTextSize(R.id.widget_next_remaining, TypedValue.COMPLEX_UNIT_SP, 11f * scale)
+                    views.setTextViewTextSize(R.id.widget_next_remaining, TypedValue.COMPLEX_UNIT_SP, 10.5f)
                     views.setViewVisibility(R.id.widget_next_remaining_container, View.VISIBLE)
                 } else {
                     views.setViewVisibility(R.id.widget_next_remaining_container, View.GONE)
@@ -233,7 +233,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScaleCapped(json, 1.0f)  // Cap: Timetable 2x3 cells overflow with large font
+                val textSizeMode = json.optString("widgetTextSize", "standard")
 
                 views.setInt(R.id.widget_timetable_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_tt_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -247,11 +247,15 @@ object MinarWidgetHelper {
                 val prefix = if (isTomorrow) "Tomorrow • " else "Minar • "
                 views.setTextViewText(R.id.widget_tt_title, "$prefix$city")
                 views.setTextColor(R.id.widget_tt_title, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_tt_title, TypedValue.COMPLEX_UNIT_SP, 12.5f * scale)
+                views.setTextViewTextSize(R.id.widget_tt_title, TypedValue.COMPLEX_UNIT_SP, 11.5f)
 
-                val dateStr = if (hijri.isNotEmpty()) "$gregorian • $hijri" else gregorian
-                views.setTextViewText(R.id.widget_tt_date, dateStr)
-                views.setTextViewTextSize(R.id.widget_tt_date, TypedValue.COMPLEX_UNIT_SP, 10.5f * scale)
+                val shortDate = if (hijri.isNotEmpty()) {
+                    val parts = hijri.split(" ")
+                    if (parts.size >= 2) "$gregorian • ${parts[0]} ${parts[1]}" else "$gregorian • $hijri"
+                } else gregorian
+
+                views.setTextViewText(R.id.widget_tt_date, shortDate)
+                views.setTextViewTextSize(R.id.widget_tt_date, TypedValue.COMPLEX_UNIT_SP, 9.5f)
 
                 val cellIds = intArrayOf(
                     R.id.widget_cell_0, R.id.widget_cell_1, R.id.widget_cell_2,
@@ -266,6 +270,13 @@ object MinarWidgetHelper {
                     R.id.widget_time_3, R.id.widget_time_4, R.id.widget_time_5
                 )
 
+                // Precisely scaled so name + time NEVER overflow the cell highlight when adjusted smaller
+                val (nameSize, timeSize) = when (textSizeMode) {
+                    "xlarge" -> Pair(10f, 16f)
+                    "large" -> Pair(9.5f, 15.5f)
+                    else -> Pair(9f, 14.5f)
+                }
+
                 for (i in 0 until minOf(prayers.length(), 6)) {
                     val p = prayers.getJSONObject(i)
                     val pName = p.optString("name", "")
@@ -275,8 +286,8 @@ object MinarWidgetHelper {
                     views.setTextViewText(nameIds[i], pName.uppercase())
                     views.setTextViewText(timeIds[i], pTime)
 
-                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, 10.5f * scale)
-                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, 19f * scale)
+                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, nameSize)
+                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, timeSize)
 
                     if (isNext) {
                         views.setInt(cellIds[i], "setBackgroundResource", style.accent.activeCellRes)
@@ -305,7 +316,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScaleCapped(json, 1.15f)  // Cap: Vertical rows have fixed height
+                val textSizeMode = json.optString("widgetTextSize", "standard")
 
                 views.setInt(R.id.widget_vertical_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_v_header, if (style.showHeader) View.VISIBLE else View.GONE)
@@ -319,11 +330,15 @@ object MinarWidgetHelper {
                 val prefix = if (isTomorrow) "Tomorrow • " else "Minar • "
                 views.setTextViewText(R.id.widget_v_title, "$prefix$city")
                 views.setTextColor(R.id.widget_v_title, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_v_title, TypedValue.COMPLEX_UNIT_SP, 12.5f * scale)
+                views.setTextViewTextSize(R.id.widget_v_title, TypedValue.COMPLEX_UNIT_SP, 11.5f)
 
-                val dateStr = if (hijri.isNotEmpty()) "$gregorian • $hijri" else gregorian
-                views.setTextViewText(R.id.widget_v_date, dateStr)
-                views.setTextViewTextSize(R.id.widget_v_date, TypedValue.COMPLEX_UNIT_SP, 10.5f * scale)
+                val shortDate = if (hijri.isNotEmpty()) {
+                    val parts = hijri.split(" ")
+                    if (parts.size >= 2) "$gregorian • ${parts[0]} ${parts[1]}" else "$gregorian • $hijri"
+                } else gregorian
+
+                views.setTextViewText(R.id.widget_v_date, shortDate)
+                views.setTextViewTextSize(R.id.widget_v_date, TypedValue.COMPLEX_UNIT_SP, 10f)
 
                 val rowIds = intArrayOf(
                     R.id.widget_v_row_0, R.id.widget_v_row_1, R.id.widget_v_row_2,
@@ -346,6 +361,12 @@ object MinarWidgetHelper {
                     R.id.widget_v_time_3, R.id.widget_v_time_4, R.id.widget_v_time_5
                 )
 
+                val (vNameSize, vSubSize, vTimeSize) = when (textSizeMode) {
+                    "xlarge" -> Triple(13.5f, 11.5f, 15.5f)
+                    "large" -> Triple(13f, 11f, 15f)
+                    else -> Triple(12.5f, 10.5f, 14.5f)
+                }
+
                 val englishSubs = arrayOf("Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha")
                 val arabicSubs = arrayOf("الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء")
 
@@ -361,9 +382,9 @@ object MinarWidgetHelper {
                     views.setTextViewText(subIds[i], subText)
                     views.setTextViewText(timeIds[i], pTime)
 
-                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, 14f * scale)
-                    views.setTextViewTextSize(subIds[i], TypedValue.COMPLEX_UNIT_SP, 12f * scale)
-                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, 16f * scale)
+                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, vNameSize)
+                    views.setTextViewTextSize(subIds[i], TypedValue.COMPLEX_UNIT_SP, vSubSize)
+                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, vTimeSize)
 
                     if (isNext) {
                         views.setInt(rowIds[i], "setBackgroundResource", style.accent.activeRowRes)
@@ -396,7 +417,7 @@ object MinarWidgetHelper {
             try {
                 val json = JSONObject(rawJson)
                 val style = resolveStyle(json)
-                val scale = getTextScaleCapped(json, 1.0f)  // Cap: Bar cells are too small to scale
+                val textSizeMode = json.optString("widgetTextSize", "standard")
 
                 views.setInt(R.id.widget_bar_root, "setBackgroundResource", style.bgRes)
 
@@ -415,6 +436,12 @@ object MinarWidgetHelper {
                     R.id.widget_bar_time_3, R.id.widget_bar_time_4, R.id.widget_bar_time_5
                 )
 
+                val (barNameSize, barTimeSize) = when (textSizeMode) {
+                    "xlarge" -> Pair(9.5f, 12f)
+                    "large" -> Pair(9f, 11.5f)
+                    else -> Pair(8.5f, 11f)
+                }
+
                 for (i in 0 until minOf(prayers.length(), 6)) {
                     val p = prayers.getJSONObject(i)
                     val pName = p.optString("name", "")
@@ -425,8 +452,8 @@ object MinarWidgetHelper {
                     views.setTextViewText(nameIds[i], shortName)
                     views.setTextViewText(timeIds[i], pTime)
 
-                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, 9f * scale)
-                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, 12.5f * scale)
+                    views.setTextViewTextSize(nameIds[i], TypedValue.COMPLEX_UNIT_SP, barNameSize)
+                    views.setTextViewTextSize(timeIds[i], TypedValue.COMPLEX_UNIT_SP, barTimeSize)
 
                     if (isNext) {
                         views.setInt(cellIds[i], "setBackgroundResource", style.accent.activeCellRes)
