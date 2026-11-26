@@ -85,6 +85,14 @@ class SettingsSheet extends StatefulWidget {
 }
 
 class _SettingsSheetState extends State<SettingsSheet> {
+  bool _isDismissing = false;
+
+  void _dismissSheet() {
+    if (_isDismissing || !mounted) return;
+    _isDismissing = true;
+    Navigator.of(context).pop();
+  }
+
   late String _selectedCountry;
   late String _selectedCity;
   late TextEditingController _customCityCtrl;
@@ -283,56 +291,88 @@ class _SettingsSheetState extends State<SettingsSheet> {
           top: true,
           bottom: false,
           child: Container(
-            margin: const EdgeInsets.only(top: 28),
+            margin: const EdgeInsets.only(top: 36),
             decoration: BoxDecoration(
               color: MinarTheme.surfaceSolid,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            ),
-          child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Drag handle
-                Center(
+                // Pinned Drag Handle & Header (Pinned at top, outside scroll view)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onVerticalDragUpdate: (details) {
+                    if (details.primaryDelta != null && details.primaryDelta! > 2) {
+                      _dismissSheet();
+                    }
+                  },
+                  onVerticalDragEnd: (details) {
+                    if (details.primaryVelocity != null && details.primaryVelocity! > 50) {
+                      _dismissSheet();
+                    }
+                  },
                   child: Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: MinarTheme.textSecondary.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(2),
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 48,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: MinarTheme.textSecondary.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Settings',
+                              style: TextStyle(
+                                color: MinarTheme.textPrimary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: _dismissSheet,
+                              icon: const Icon(Icons.close_rounded,
+                                  color: MinarTheme.textSecondary, size: 20),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Settings',
-                      style: TextStyle(
-                        color: MinarTheme.textPrimary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                Flexible(
+                  child: NotificationListener<ScrollUpdateNotification>(
+                    onNotification: (notification) {
+                      if (notification.metrics.pixels <= 0 &&
+                          notification.scrollDelta != null &&
+                          notification.scrollDelta! < -8) {
+                        _dismissSheet();
+                        return true;
+                      }
+                      return false;
+                    },
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 4,
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded,
-                          color: MinarTheme.textSecondary, size: 20),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                 // Location Section
                 const Text(
                   'LOCATION',
@@ -1181,11 +1221,109 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 24),
+
+                // ABOUT & UPDATES
+                const Text(
+                  'ABOUT & UPDATES',
+                  style: TextStyle(
+                    color: MinarTheme.sectionHeader,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: MinarTheme.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: MinarTheme.borderFaint),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: MinarTheme.surfaceSolid,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: MinarTheme.borderFaint),
+                            ),
+                            child: Icon(Icons.nightlight_round,
+                                color: MinarTheme.goldWarm, size: 24),
+                          ),
+                          const SizedBox(width: 14),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Minar Prayer Times',
+                                  style: TextStyle(
+                                    color: MinarTheme.textPrimary,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  'Version 1.0.0 (Build 1) • Open Source',
+                                  style: TextStyle(
+                                    color: MinarTheme.textSecondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      const Text(
+                        'Fast, privacy-focused prayer timetable with offline calculations and native home screen widgets.',
+                        style: TextStyle(
+                          color: MinarTheme.textSecondary,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _checkForUpdates(context),
+                          icon: const Icon(Icons.sync_rounded, size: 16),
+                          label: const Text('Check for updates',
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MinarTheme.goldWarm,
+                            foregroundColor: MinarTheme.midnightBottom,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
         ),
-      );
+      ),
+    ],
+  ),
+),
+);
       },
     );
   }

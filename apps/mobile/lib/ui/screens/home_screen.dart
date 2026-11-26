@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         showModalBottomSheet(
                                           context: context,
                                           isScrollControlled: true,
+                                          enableDrag: false,
                                           backgroundColor: Colors.transparent,
                                           shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
