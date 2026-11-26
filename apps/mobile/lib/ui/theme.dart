@@ -2,28 +2,85 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MinarTheme {
-  // Much deeper, inky midnight blue palette sampled directly from the icon
-  static const Color midnightTop = Color(0xFF0C1424);
-  static const Color midnightBottom = Color(0xFF060A12);
-  static const Color surfaceSolid = Color(0xFF0E1729);
-  static const Color surfaceSubtle = Color(0xFF131F36);
+  // Dynamic App Theme Colors (Defaults to inky midnight)
+  static Color midnightTop = const Color(0xFF0C1424);
+  static Color midnightBottom = const Color(0xFF060A12);
+  static Color surfaceSolid = const Color(0xFF0E1729);
+  static Color surfaceSubtle = const Color(0xFF131F36);
 
-  // Exact icon moon crescent yellows (soft luminous butter gold)
-  static const Color goldLight = Color(0xFFF4DC9F);
-  static const Color goldWarm = Color(0xFFE8C582);
-  static const Color goldPill = Color(0x1FE8C582);
+  // Dynamic Accent Colors (Defaults to icon crescent gold)
+  static Color goldLight = const Color(0xFFF4DC9F);
+  static Color goldWarm = const Color(0xFFE8C582);
+  static Color goldPill = const Color(0x1FE8C582);
 
-  // Clean neutral typography (keeps yellow as a rare accent)
+  // Clean neutral typography
   static const Color textPrimary = Color(0xFFF3F5F8);
   static const Color textSecondary = Color(0xFF7E8EA6);
   static const Color sectionHeader = Color(0xFF6B7E99);
   static const Color borderFaint = Color(0x12FFFFFF);
 
-  static LinearGradient get backgroundGradient => const LinearGradient(
+  static LinearGradient get backgroundGradient => LinearGradient(
         colors: [midnightTop, midnightBottom],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       );
+
+  static void applyTheme({String theme = 'midnight', String accent = 'gold'}) {
+    switch (theme) {
+      case 'amoled':
+        midnightTop = const Color(0xFF050505);
+        midnightBottom = const Color(0xFF000000);
+        surfaceSolid = const Color(0xFF0C0C0C);
+        surfaceSubtle = const Color(0xFF151515);
+        break;
+      case 'emerald':
+        midnightTop = const Color(0xFF071812);
+        midnightBottom = const Color(0xFF030C09);
+        surfaceSolid = const Color(0xFF0B2119);
+        surfaceSubtle = const Color(0xFF112D23);
+        break;
+      case 'royal':
+        midnightTop = const Color(0xFF101026);
+        midnightBottom = const Color(0xFF070714);
+        surfaceSolid = const Color(0xFF151532);
+        surfaceSubtle = const Color(0xFF1E1E42);
+        break;
+      default: // 'midnight'
+        midnightTop = const Color(0xFF0C1424);
+        midnightBottom = const Color(0xFF060A12);
+        surfaceSolid = const Color(0xFF0E1729);
+        surfaceSubtle = const Color(0xFF131F36);
+        break;
+    }
+
+    switch (accent) {
+      case 'emerald':
+        goldWarm = const Color(0xFF4ADE80);
+        goldLight = const Color(0xFF86EFAC);
+        goldPill = const Color(0x1F4ADE80);
+        break;
+      case 'white':
+        goldWarm = const Color(0xFFFFFFFF);
+        goldLight = const Color(0xFFF3F4F6);
+        goldPill = const Color(0x1FFFFFFF);
+        break;
+      case 'blue':
+        goldWarm = const Color(0xFF60A5FA);
+        goldLight = const Color(0xFF93C5FD);
+        goldPill = const Color(0x1F60A5FA);
+        break;
+      case 'rose':
+        goldWarm = const Color(0xFFF472B6);
+        goldLight = const Color(0xFFFBCFE8);
+        goldPill = const Color(0x1FF472B6);
+        break;
+      default: // 'gold'
+        goldWarm = const Color(0xFFE8C582);
+        goldLight = const Color(0xFFF4DC9F);
+        goldPill = const Color(0x1FE8C582);
+        break;
+    }
+  }
 
   static const List<String> availableFonts = [
     'System Default',
@@ -95,7 +152,7 @@ class MinarTheme {
       scaffoldBackgroundColor: midnightBottom,
       primaryColor: goldWarm,
       textTheme: textTheme,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: goldWarm,
         secondary: goldLight,
         surface: surfaceSolid,

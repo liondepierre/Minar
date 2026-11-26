@@ -9,6 +9,10 @@ class WidgetService {
     required PrayerSchedule schedule,
     required NextPrayer? nextPrayer,
     required bool useTurkish,
+    String widgetTheme = 'midnight',
+    String widgetAccent = 'gold',
+    bool widgetShowHeader = true,
+    String widgetTextSize = 'standard',
   }) async {
     if (!Platform.isAndroid) return;
 
@@ -38,6 +42,10 @@ class WidgetService {
         'nextRemaining': nextRemaining,
         'isTomorrowFajr': nextPrayer?.isTomorrowFajr ?? false,
         'prayers': prayersList,
+        'widgetTheme': widgetTheme,
+        'widgetAccent': widgetAccent,
+        'widgetShowHeader': widgetShowHeader,
+        'widgetTextSize': widgetTextSize,
       });
     } catch (_) {
       // Non-fatal if platform channel is unhandled or in tests

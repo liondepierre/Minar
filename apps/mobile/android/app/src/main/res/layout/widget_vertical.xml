@@ -3,12 +3,13 @@
     android:id="@+id/widget_vertical_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_card_bg"
+    android:background="@drawable/widget_bg_midnight"
     android:orientation="vertical"
     android:padding="12dp">
 
-    <!-- Header -->
+    <!-- Header (Toggleable) -->
     <LinearLayout
+        android:id="@+id/widget_v_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -22,9 +23,9 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Ikast, Denmark"
+            android:text="Minar • Ikast"
             android:textColor="#E8C582"
-            android:textSize="15sp"
+            android:textSize="12.5sp"
             android:textStyle="bold" />
 
         <TextView
@@ -35,7 +36,7 @@
             android:maxLines="1"
             android:text="26 Nov • 16 Jumādá"
             android:textColor="#7E8EA6"
-            android:textSize="12.5sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 
     <!-- 6 Vertical Rows -->
@@ -45,21 +46,21 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <!-- Row 0: Fajr -->
+        <!-- Row 0: Fajr / İmsak -->
         <LinearLayout
             android:id="@+id/widget_v_row_0"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@drawable/widget_row_active_gold"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_0"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_gold" />
 
@@ -67,37 +68,43 @@
                 android:id="@+id/widget_v_name_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="İmsak"
                 android:textColor="#E8C582"
-                android:textSize="17sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_v_sub_0"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Fajr"
-                android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="الفجر"
+                android:textAlignment="viewStart"
+                android:textColor="#A0B0C8"
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="06:05"
                 android:textColor="#F4DC9F"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#16233B" />
-
-        <!-- Row 1: Sunrise -->
+        <!-- Row 1: Sunrise / Güneş -->
         <LinearLayout
             android:id="@+id/widget_v_row_1"
             android:layout_width="match_parent"
@@ -105,13 +112,12 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_1"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_dim" />
 
@@ -119,37 +125,42 @@
                 android:id="@+id/widget_v_name_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Güneş"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textColor="#F3F5F8"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/widget_v_sub_1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Sunrise"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="الشروق"
+                android:textAlignment="viewStart"
                 android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="08:15"
                 android:textColor="#FFFFFF"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#16233B" />
-
-        <!-- Row 2: Dhuhr -->
+        <!-- Row 2: Dhuhr / Öğle -->
         <LinearLayout
             android:id="@+id/widget_v_row_2"
             android:layout_width="match_parent"
@@ -157,13 +168,12 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_2"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_dim" />
 
@@ -171,37 +181,42 @@
                 android:id="@+id/widget_v_name_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Öğle"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textColor="#F3F5F8"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/widget_v_sub_2"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Dhuhr"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="الظهر"
+                android:textAlignment="viewStart"
                 android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="12:16"
                 android:textColor="#FFFFFF"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#16233B" />
-
-        <!-- Row 3: Asr -->
+        <!-- Row 3: Asr / İkindi -->
         <LinearLayout
             android:id="@+id/widget_v_row_3"
             android:layout_width="match_parent"
@@ -209,13 +224,12 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_3"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_dim" />
 
@@ -223,37 +237,42 @@
                 android:id="@+id/widget_v_name_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="İkindi"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textColor="#F3F5F8"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/widget_v_sub_3"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Asr"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="العصر"
+                android:textAlignment="viewStart"
                 android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="13:47"
                 android:textColor="#FFFFFF"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#16233B" />
-
-        <!-- Row 4: Maghrib -->
+        <!-- Row 4: Maghrib / Akşam -->
         <LinearLayout
             android:id="@+id/widget_v_row_4"
             android:layout_width="match_parent"
@@ -261,13 +280,12 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_4"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_dim" />
 
@@ -275,37 +293,42 @@
                 android:id="@+id/widget_v_name_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Akşam"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textColor="#F3F5F8"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/widget_v_sub_4"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Maghrib"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="المغرب"
+                android:textAlignment="viewStart"
                 android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="16:06"
                 android:textColor="#FFFFFF"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#16233B" />
-
-        <!-- Row 5: Isha -->
+        <!-- Row 5: Isha / Yatsı -->
         <LinearLayout
             android:id="@+id/widget_v_row_5"
             android:layout_width="match_parent"
@@ -313,13 +336,12 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:paddingHorizontal="8dp">
 
             <ImageView
                 android:id="@+id/widget_v_dot_5"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/widget_dot_dim" />
 
@@ -327,28 +349,38 @@
                 android:id="@+id/widget_v_name_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Yatsı"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textColor="#F3F5F8"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/widget_v_sub_5"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Isha"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="العشاء"
+                android:textAlignment="viewStart"
                 android:textColor="#7E8EA6"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/widget_v_time_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="18:08"
                 android:textColor="#FFFFFF"
-                android:textSize="19sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>

@@ -11,7 +11,7 @@ void main() async {
 
   // Dark navigation bar and status bar
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
+    SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       systemNavigationBarColor: MinarTheme.midnightBottom,

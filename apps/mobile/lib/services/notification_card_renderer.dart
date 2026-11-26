@@ -65,7 +65,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: name.toUpperCase(),
               offset: Offset(cellX + 46, cellY + 12),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 54,
                 fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: 'NEXT',
               offset: Offset(cellX + colWidth - 68, cellY + 21),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldWarm,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -91,7 +91,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: item.time,
               offset: Offset(cellX + 18, cellY + 82),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 102,
                 fontWeight: FontWeight.w800,
@@ -213,7 +213,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: name.toUpperCase(),
               offset: Offset(cellX + 38, cellY + 16),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 34,
                 fontWeight: FontWeight.bold,
@@ -230,7 +230,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: 'NEXT',
               offset: Offset(cellX + colWidth - 65, cellY + 22),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldWarm,
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -241,7 +241,7 @@ class NotificationCardRenderer {
           _drawText(canvas,
               text: item.time,
               offset: Offset(cellX + 20, cellY + 62),
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 66,
                 fontWeight: FontWeight.w800,
@@ -363,7 +363,7 @@ class NotificationCardRenderer {
               text: name.toUpperCase(),
               centerX: centerX,
               topY: y + 20,
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
@@ -375,7 +375,7 @@ class NotificationCardRenderer {
               text: item.time,
               centerX: centerX,
               topY: y + 66,
-              style: const TextStyle(
+              style: TextStyle(
                 color: MinarTheme.goldLight,
                 fontSize: 50,
                 fontWeight: FontWeight.w900,

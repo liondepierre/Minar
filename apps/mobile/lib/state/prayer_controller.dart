@@ -11,6 +11,7 @@ import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/widget_service.dart';
+import '../ui/theme.dart';
 
 class PrayerController extends ChangeNotifier {
   final StorageService _storage;
@@ -26,6 +27,7 @@ class PrayerController extends ChangeNotifier {
   Timer? _ticker;
 
   PrayerController(this._storage) {
+    MinarTheme.applyTheme(theme: _storage.appTheme, accent: _storage.appAccent);
     _weeklySchedule = _storage.cachedWeeklySchedule;
     _schedule = _weeklySchedule?.today ??
         _storage.cachedSchedule ??
@@ -220,6 +222,10 @@ class PrayerController extends ChangeNotifier {
       schedule: eff,
       nextPrayer: nextPrayer,
       useTurkish: useTurkish,
+      widgetTheme: widgetTheme,
+      widgetAccent: widgetAccent,
+      widgetShowHeader: widgetShowHeader,
+      widgetTextSize: widgetTextSize,
     );
   }
 
@@ -479,13 +485,66 @@ class PrayerController extends ChangeNotifier {
       );
     }
     if (_schedule != null) {
-      WidgetService.updateWidgets(
-        schedule: effectiveSchedule,
-        nextPrayer: nextPrayer,
-        useTurkish: useTurkish,
-      );
+      syncWidgets();
     }
     notifyListeners();
+  }
+
+  String get widgetTheme => _storage.widgetTheme;
+  String get widgetAccent => _storage.widgetAccent;
+  bool get widgetShowHeader => _storage.widgetShowHeader;
+  String get widgetTextSize => _storage.widgetTextSize;
+
+  Future<void> setWidgetTheme(String theme) async {
+    _storage.widgetTheme = theme;
+    await syncWidgets();
+    notifyListeners();
+  }
+
+  Future<void> setWidgetAccent(String accent) async {
+    _storage.widgetAccent = accent;
+    await syncWidgets();
+    notifyListeners();
+  }
+
+  Future<void> setWidgetShowHeader(bool show) async {
+    _storage.widgetShowHeader = show;
+    await syncWidgets();
+    notifyListeners();
+  }
+
+  Future<void> setWidgetTextSize(String size) async {
+    _storage.widgetTextSize = size;
+    await syncWidgets();
+    notifyListeners();
+  }
+
+  String get appTheme => _storage.appTheme;
+  String get appAccent => _storage.appAccent;
+
+  Future<void> setAppTheme(String theme) async {
+    _storage.appTheme = theme;
+    MinarTheme.applyTheme(theme: theme, accent: appAccent);
+    notifyListeners();
+  }
+
+  Future<void> setAppAccent(String accent) async {
+    _storage.appAccent = accent;
+    MinarTheme.applyTheme(theme: appTheme, accent: accent);
+    notifyListeners();
+  }
+
+  Future<void> syncWidgets() async {
+    if (_schedule == null) return;
+    await WidgetService.updateWidgets(
+      schedule: effectiveSchedule,
+      nextPrayer: nextPrayer,
+      useTurkish: useTurkish,
+      widgetTheme: widgetTheme,
+      widgetAccent: widgetAccent,
+      widgetShowHeader: widgetShowHeader,
+      widgetTextSize: widgetTextSize,
+    );
   }
 
   Future<void> toggleNotifications() async {

@@ -245,7 +245,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
       padding: const EdgeInsets.only(top: 6),
       child: Text(
         _customCityError!,
-        style: const TextStyle(
+        style: TextStyle(
           color: MinarTheme.goldLight,
           fontSize: 11,
         ),
@@ -279,17 +279,21 @@ class _SettingsSheetState extends State<SettingsSheet> {
         final isCustomCountry = _selectedCountry == _kOtherCountry;
         final isCustomCity = _selectedCity == _kOtherCity;
 
-        return Container(
-          decoration: const BoxDecoration(
-            color: MinarTheme.surfaceSolid,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 14,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
+        return SafeArea(
+          top: true,
+          bottom: false,
+          child: Container(
+            margin: const EdgeInsets.only(top: 28),
+            decoration: BoxDecoration(
+              color: MinarTheme.surfaceSolid,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 16,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,7 +442,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                   : _selectedCountry,
                               isExpanded: true,
                               dropdownColor: MinarTheme.surfaceSolid,
-                              icon: const Icon(Icons.arrow_drop_down,
+                              icon: Icon(Icons.arrow_drop_down,
                                   color: MinarTheme.goldWarm, size: 18),
                               items: [
                                 ..._popularLocations.keys.map(
@@ -453,7 +457,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     ),
                                   ),
                                 ),
-                                const DropdownMenuItem(
+                                DropdownMenuItem(
                                   value: _kOtherCountry,
                                   child: Text(
                                     _kOtherCountry,
@@ -486,7 +490,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 value: isCustomCity ? _kOtherCity : _selectedCity,
                                 isExpanded: true,
                                 dropdownColor: MinarTheme.surfaceSolid,
-                                icon: const Icon(Icons.arrow_drop_down,
+                                icon: Icon(Icons.arrow_drop_down,
                                     color: MinarTheme.goldWarm, size: 18),
                                 items: [
                                   ...(_popularLocations[_selectedCountry] ?? [])
@@ -500,7 +504,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                               ),
                                             ),
                                           )),
-                                  const DropdownMenuItem(
+                                  DropdownMenuItem(
                                     value: _kOtherCity,
                                     child: Text(
                                       _kOtherCity,
@@ -701,7 +705,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       value: c.method,
                       isExpanded: true,
                       dropdownColor: MinarTheme.surfaceSolid,
-                      icon: const Icon(Icons.arrow_drop_down,
+                      icon: Icon(Icons.arrow_drop_down,
                           color: MinarTheme.goldWarm),
                       items: CalculationMethod.values.map((m) {
                         return DropdownMenuItem(
@@ -810,7 +814,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             : 'table',
                         isExpanded: true,
                         dropdownColor: MinarTheme.surfaceSolid,
-                        icon: const Icon(Icons.arrow_drop_down,
+                        icon: Icon(Icons.arrow_drop_down,
                             color: MinarTheme.goldWarm),
                         items: const [
                           DropdownMenuItem(
@@ -851,6 +855,156 @@ class _SettingsSheetState extends State<SettingsSheet> {
 
                 const SizedBox(height: 18),
 
+                // App Theme & Accent Customization
+                const Text(
+                  'APP THEME & ACCENT',
+                  style: TextStyle(
+                    color: MinarTheme.sectionHeader,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // App Theme Mode Picker
+                const Text(
+                  'App Theme Palette',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildAppThemeChip('Midnight', 'midnight', c),
+                      const SizedBox(width: 8),
+                      _buildAppThemeChip('AMOLED Black', 'amoled', c),
+                      const SizedBox(width: 8),
+                      _buildAppThemeChip('Emerald Night', 'emerald', c),
+                      const SizedBox(width: 8),
+                      _buildAppThemeChip('Royal Navy', 'royal', c),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // App Accent Color Picker
+                const Text(
+                  'App Accent Color',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildAppAccentDot('Gold', 'gold', const Color(0xFFE8C582), c),
+                      const SizedBox(width: 8),
+                      _buildAppAccentDot('Emerald', 'emerald', const Color(0xFF4ADE80), c),
+                      const SizedBox(width: 8),
+                      _buildAppAccentDot('White', 'white', Colors.white, c),
+                      const SizedBox(width: 8),
+                      _buildAppAccentDot('Sky Blue', 'blue', const Color(0xFF60A5FA), c),
+                      const SizedBox(width: 8),
+                      _buildAppAccentDot('Rose', 'rose', const Color(0xFFF472B6), c),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
+
+                // Home Screen Widgets Customization
+                const Text(
+                  'HOME SCREEN WIDGETS',
+                  style: TextStyle(
+                    color: MinarTheme.sectionHeader,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Widget Theme Picker (Midnight, AMOLED, Glass, Transparent)
+                const Text(
+                  'Background Style',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildThemeChip('Midnight', 'midnight', c),
+                      const SizedBox(width: 8),
+                      _buildThemeChip('AMOLED Black', 'amoled', c),
+                      const SizedBox(width: 8),
+                      _buildThemeChip('Glass Frost', 'glass', c),
+                      const SizedBox(width: 8),
+                      _buildThemeChip('Transparent', 'transparent', c),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Widget Accent Picker (Gold, Emerald, White, Sky Blue)
+                const Text(
+                  'Accent Color',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildAccentDot('Gold', 'gold', const Color(0xFFE8C582), c),
+                      const SizedBox(width: 8),
+                      _buildAccentDot('Emerald', 'emerald', const Color(0xFF4ADE80), c),
+                      const SizedBox(width: 8),
+                      _buildAccentDot('White', 'white', Colors.white, c),
+                      const SizedBox(width: 8),
+                      _buildAccentDot('Sky Blue', 'blue', const Color(0xFF60A5FA), c),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Show Header Switch
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Show Header in Widgets',
+                      style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13)),
+                  subtitle: const Text(
+                    'Display location and Hijri date header bar',
+                    style: TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
+                  ),
+                  value: c.widgetShowHeader,
+                  activeColor: MinarTheme.goldWarm,
+                  onChanged: (val) => c.setWidgetShowHeader(val),
+                ),
+                const SizedBox(height: 8),
+
+                // Widget Font Size (Standard, Large +15%, X-Large +30%)
+                const Text(
+                  'Widget Font Size',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildTextSizeChip('Standard', 'standard', c),
+                      const SizedBox(width: 8),
+                      _buildTextSizeChip('Large (+15%)', 'large', c),
+                      const SizedBox(width: 8),
+                      _buildTextSizeChip('X-Large (+30%)', 'xlarge', c),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
                 // App Typography (7 Fonts with Live Previews)
                 const Text(
                   'TYPOGRAPHY',
@@ -877,7 +1031,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           : MinarTheme.availableFonts.first,
                       isExpanded: true,
                       dropdownColor: MinarTheme.surfaceSolid,
-                      icon: const Icon(Icons.arrow_drop_down,
+                      icon: Icon(Icons.arrow_drop_down,
                           color: MinarTheme.goldWarm),
                       selectedItemBuilder: (context) {
                         return MinarTheme.availableFonts.map((font) {
@@ -919,7 +1073,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 '12:45',
                                 style: MinarTheme.fontTextStyle(
                                   font,
-                                  baseStyle: const TextStyle(
+                                  baseStyle: TextStyle(
                                     color: MinarTheme.goldLight,
                                     fontSize: 13,
                                   ),
@@ -1000,7 +1154,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             horizontal: 14, vertical: 8),
                       ),
                       child: _isSyncing
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -1030,8 +1184,228 @@ class _SettingsSheetState extends State<SettingsSheet> {
               ],
             ),
           ),
-        );
+        ),
+      );
       },
+    );
+  }
+
+  Widget _buildThemeChip(String label, String value, PrayerController c) {
+    final isSelected = c.widgetTheme == value;
+    return GestureDetector(
+      onTap: () => c.setWidgetTheme(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? MinarTheme.goldWarm : MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? MinarTheme.goldLight : MinarTheme.borderFaint,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF090E18) : MinarTheme.textPrimary,
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccentDot(String label, String value, Color color, PrayerController c) {
+    final isSelected = c.widgetAccent == value;
+    return GestureDetector(
+      onTap: () => c.setWidgetAccent(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : MinarTheme.borderFaint,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: isSelected
+                    ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 4)]
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? MinarTheme.textPrimary : MinarTheme.textSecondary,
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextSizeChip(String label, String value, PrayerController c) {
+    final isSelected = c.widgetTextSize == value;
+    return GestureDetector(
+      onTap: () => c.setWidgetTextSize(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? MinarTheme.goldWarm : MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? MinarTheme.goldLight : MinarTheme.borderFaint,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF090E18) : MinarTheme.textPrimary,
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppThemeChip(String label, String value, PrayerController c) {
+    final isSelected = c.appTheme == value;
+    return GestureDetector(
+      onTap: () => c.setAppTheme(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? MinarTheme.goldWarm : MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? MinarTheme.goldLight : MinarTheme.borderFaint,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF090E18) : MinarTheme.textPrimary,
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppAccentDot(String label, String value, Color color, PrayerController c) {
+    final isSelected = c.appAccent == value;
+    return GestureDetector(
+      onTap: () => c.setAppAccent(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : MinarTheme.borderFaint,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: isSelected
+                    ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 4)]
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? MinarTheme.textPrimary : MinarTheme.textSecondary,
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _checkForUpdates(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: MinarTheme.surfaceSolid,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: MinarTheme.borderFaint),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: MinarTheme.surfaceSubtle,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.greenAccent, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Text('Up to Date',
+                style: TextStyle(
+                    color: MinarTheme.textPrimary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Minar v1.0.0 (Build 1) is currently the latest release.',
+                style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
+            SizedBox(height: 10),
+            Text(
+              """• Local Diyanet & AlAdhan timing engine active
+• 4 native home screen widgets synchronized
+• Battery-efficient offline timetable loaded
+• GitHub: liondepierre/Minar""",
+              style: TextStyle(color: MinarTheme.textSecondary, fontSize: 12, height: 1.45),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
+            child: const Text('Awesome', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 }

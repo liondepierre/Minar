@@ -2,9 +2,28 @@
 /.build
 /build
 /Packages
-xcuserdata/
+userdata/
 DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
-*.hprof
+
+# Android / Gradle
+.gradle/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/local.properties
+**/android/key.properties
+*.jks
+*.keystore
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/build/
+**/apps/mobile/build/
+**/apps/mobile/.dart_tool/
+**/apps/mobile/ios/Flutter/
+**/apps/mobile/android/local.properties

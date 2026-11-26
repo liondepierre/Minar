@@ -19,6 +19,12 @@ class StorageService {
   static const String _kPinnedStyle = 'minar_pinned_style';
   static const String _kLocationMode = 'minar_location_mode';
   static const String _kFontFamily = 'minar_font_family';
+  static const String _kWidgetTheme = 'minar_widget_theme';
+  static const String _kWidgetAccent = 'minar_widget_accent';
+  static const String _kWidgetShowHeader = 'minar_widget_show_header';
+  static const String _kWidgetTextSize = 'minar_widget_text_size';
+  static const String _kAppTheme = 'minar_app_theme';
+  static const String _kAppAccent = 'minar_app_accent';
 
   final SharedPreferences _prefs;
 
@@ -119,4 +125,28 @@ class StorageService {
       _prefs.setString(_kCachedWeeklySchedule, jsonEncode(schedule.toJson()));
     }
   }
+
+  /// Widget theme: 'midnight', 'amoled', 'glass', 'transparent'
+  String get widgetTheme => _prefs.getString(_kWidgetTheme) ?? 'midnight';
+  set widgetTheme(String value) => _prefs.setString(_kWidgetTheme, value);
+
+  /// Widget accent: 'gold', 'emerald', 'white', 'blue'
+  String get widgetAccent => _prefs.getString(_kWidgetAccent) ?? 'gold';
+  set widgetAccent(String value) => _prefs.setString(_kWidgetAccent, value);
+
+  /// Toggle widget top header (city and date)
+  bool get widgetShowHeader => _prefs.getBool(_kWidgetShowHeader) ?? true;
+  set widgetShowHeader(bool value) => _prefs.setBool(_kWidgetShowHeader, value);
+
+  /// Widget text size scale: 'standard', 'large', 'xlarge'
+  String get widgetTextSize => _prefs.getString(_kWidgetTextSize) ?? 'standard';
+  set widgetTextSize(String value) => _prefs.setString(_kWidgetTextSize, value);
+
+  /// App theme: 'midnight', 'amoled', 'emerald', 'royal'
+  String get appTheme => _prefs.getString(_kAppTheme) ?? 'midnight';
+  set appTheme(String value) => _prefs.setString(_kAppTheme, value);
+
+  /// App accent: 'gold', 'emerald', 'white', 'blue', 'rose'
+  String get appAccent => _prefs.getString(_kAppAccent) ?? 'gold';
+  set appAccent(String value) => _prefs.setString(_kAppAccent, value);
 }

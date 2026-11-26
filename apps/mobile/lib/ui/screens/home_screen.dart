@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         width: 28,
                                         height: 28,
                                         errorBuilder: (_, __, ___) =>
-                                            const Icon(
+                                            Icon(
                                           Icons.nightlight_round,
                                           color: MinarTheme.goldWarm,
                                           size: 24,
@@ -127,8 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: [
                                     if (c.isLoading)
-                                      const Padding(
-                                        padding: EdgeInsets.all(8),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8),
                                         child: SizedBox(
                                           width: 16,
                                           height: 16,
@@ -160,8 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         showModalBottomSheet(
                                           context: context,
                                           isScrollControlled: true,
-                                          backgroundColor:
-                                              MinarTheme.surfaceSolid,
+                                          backgroundColor: Colors.transparent,
                                           shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
                                               top: Radius.circular(24),
@@ -246,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.info_outline_rounded,
                                       size: 16,
                                       color: MinarTheme.goldWarm,
