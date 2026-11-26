@@ -12,23 +12,23 @@ void main() async {
   assert(diff.inMinutes == 12, 'Dhuhr diff must be 12 minutes');
   print('✔ Test 1 Passed: Countdown arithmetic validated.');
 
-  // Test 2: Live Diyanet API check for Ikast
+  // Test 2: Live Diyanet API check for Istanbul
   final client = HttpClient();
   try {
     final searchUri = Uri.parse(
-        'https://ezanvakti.imsakiyem.com/api/locations/search/districts?q=ikast');
+        'https://ezanvakti.imsakiyem.com/api/locations/search/districts?q=istanbul');
     final req = await client.getUrl(searchUri);
     final res = await req.close();
     final body = await res.transform(utf8.decoder).join();
     final json = jsonDecode(body) as Map<String, dynamic>;
     final data = json['data'] as List<dynamic>;
-    final ikast = data.first as Map<String, dynamic>;
-    final districtId = ikast['_id'];
-    assert(districtId == '12625', 'Ikast district ID must be 12625');
-    print('✔ Test 2 Passed: Ikast resolved to Diyanet district ID 12625.');
+    final istanbul = data.first as Map<String, dynamic>;
+    final districtId = istanbul['_id'];
+    assert(districtId == '9541', 'Istanbul district ID must be 9541');
+    print('✔ Test 2 Passed: Istanbul resolved to Diyanet district ID 9541.');
 
     final timesUri = Uri.parse(
-        'https://ezanvakti.imsakiyem.com/api/prayer-times/12625/daily');
+        'https://ezanvakti.imsakiyem.com/api/prayer-times/9541/daily');
     final timesReq = await client.getUrl(timesUri);
     final timesRes = await timesReq.close();
     final timesBody = await timesRes.transform(utf8.decoder).join();
@@ -36,7 +36,7 @@ void main() async {
     final timesData = (timesJson['data'] as List<dynamic>).first as Map<String, dynamic>;
     final times = timesData['times'] as Map<String, dynamic>;
     final yatsi = times['yatsi'];
-    print('✔ Test 3 Passed: Live Ikast Diyanet times confirmed (Yatsı: $yatsi).');
+    print('✔ Test 3 Passed: Live Istanbul Diyanet times confirmed (Yatsı: $yatsi).');
   } catch (e) {
     print('Network check note: $e');
   } finally {

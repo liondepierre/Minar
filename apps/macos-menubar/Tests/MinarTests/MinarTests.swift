@@ -26,8 +26,8 @@ final class MinarTests: XCTestCase {
         ]
 
         let schedule = PrayerSchedule(
-            city: "Ikast",
-            country: "Denmark",
+            city: "Tokyo",
+            country: "Japan",
             method: .diyanet,
             hijriDate: "14-05-1448",
             gregorianDate: "25 Oct 2026",

@@ -59,8 +59,8 @@ void main() {
       ];
 
       final schedule = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '14 Cemaziyelevvel 1448 AH',
         gregorianDate: '25.10.2026',
@@ -118,8 +118,8 @@ void main() {
       ];
 
       final schedule = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '14 Cemaziyelevvel 1448 AH',
         gregorianDate: '25.10.2026',
@@ -144,8 +144,8 @@ void main() {
       ];
 
       final original = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '14 Cemaziyelevvel 1448 AH',
         gregorianDate: '25.10.2026',
@@ -155,8 +155,8 @@ void main() {
       final json = original.toJson();
       final restored = PrayerSchedule.fromJson(json);
 
-      expect(restored.city, 'Ikast');
-      expect(restored.country, 'Denmark');
+      expect(restored.city, 'Tokyo');
+      expect(restored.country, 'Japan');
       expect(restored.method, CalculationMethod.diyanet);
       expect(restored.items.first.time, '05:10');
     });
@@ -164,10 +164,10 @@ void main() {
     test('City sanitization and validation rejects punctuation/gibberish', () {
       expect(GeocodingService.sanitize('  New   York  '), 'New York');
       expect(GeocodingService.isValidPlaceName('Ejstrupholm'), true);
-      expect(GeocodingService.isValidPlaceName('  Ikast  '), true);
+      expect(GeocodingService.isValidPlaceName('  Tokyo  '), true);
       expect(GeocodingService.isValidPlaceName('Malmö'), true);
-      expect(GeocodingService.isValidPlaceName('Ikast ..dew.de.'), false);
-      expect(GeocodingService.isValidPlaceName('Ikast123'), false);
+      expect(GeocodingService.isValidPlaceName('Tokyo ..dew.de.'), false);
+      expect(GeocodingService.isValidPlaceName('Tokyo123'), false);
       expect(GeocodingService.isValidPlaceName('a'), false);
       expect(GeocodingService.normalize('Düsseldorf'), 'dusseldorf');
       expect(GeocodingService.countriesMatch('Turkey', 'Türkiye'), true);
@@ -185,8 +185,8 @@ void main() {
       ];
 
       final schedule = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '14 Cemaziyelevvel 1448 AH',
         gregorianDate: '25.10.2026',
@@ -243,8 +243,8 @@ void main() {
       ];
 
       final todaySched = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '16 Cemaziyelahir 1448',
         gregorianDate: '25.11.2026',
@@ -252,8 +252,8 @@ void main() {
       );
 
       final tomorrowSched = PrayerSchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         hijriDate: '17 Cemaziyelahir 1448',
         gregorianDate: '26.11.2026',
@@ -261,8 +261,8 @@ void main() {
       );
 
       final weekly = WeeklySchedule(
-        city: 'Ikast',
-        country: 'Denmark',
+        city: 'Tokyo',
+        country: 'Japan',
         method: CalculationMethod.diyanet,
         days: [todaySched, tomorrowSched],
       );

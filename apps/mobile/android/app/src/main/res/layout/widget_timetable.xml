@@ -24,7 +24,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="Minar • Ikast"
+            android:text="Minar • Tokyo"
             android:textColor="#E8C582"
             android:textSize="10.5sp"
             android:textStyle="bold" />

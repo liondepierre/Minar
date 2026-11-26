@@ -35,10 +35,10 @@ class StorageService {
     return StorageService(prefs);
   }
 
-  String get city => _prefs.getString(_kCity) ?? 'Ikast';
+  String get city => _prefs.getString(_kCity) ?? 'Tokyo';
   set city(String value) => _prefs.setString(_kCity, value);
 
-  String get country => _prefs.getString(_kCountry) ?? 'Denmark';
+  String get country => _prefs.getString(_kCountry) ?? 'Japan';
   set country(String value) => _prefs.setString(_kCountry, value);
 
   String? get districtId => _prefs.getString(_kDistrictId);

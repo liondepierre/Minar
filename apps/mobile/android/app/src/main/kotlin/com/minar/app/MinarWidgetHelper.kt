@@ -167,7 +167,7 @@ object MinarWidgetHelper {
                 views.setInt(R.id.widget_next_prayer_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_next_header, if (style.showHeader) View.VISIBLE else View.GONE)
 
-                val city = json.optString("city", "Ikast")
+                val city = json.optString("city", "Tokyo")
                 val hijri = json.optString("hijriDate", "")
                 val nextName = json.optString("nextName", "İMSAK")
                 val nextTime = json.optString("nextTime", "06:05")
@@ -238,7 +238,7 @@ object MinarWidgetHelper {
                 views.setInt(R.id.widget_timetable_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_tt_header, if (style.showHeader) View.VISIBLE else View.GONE)
 
-                val city = json.optString("city", "Ikast")
+                val city = json.optString("city", "Tokyo")
                 val hijri = json.optString("hijriDate", "")
                 val gregorian = json.optString("gregorianDate", "")
                 val isTomorrow = json.optBoolean("isTomorrowFajr", false)
@@ -320,7 +320,7 @@ object MinarWidgetHelper {
                 views.setInt(R.id.widget_vertical_root, "setBackgroundResource", style.bgRes)
                 views.setViewVisibility(R.id.widget_v_header, if (style.showHeader) View.VISIBLE else View.GONE)
 
-                val city = json.optString("city", "Ikast")
+                val city = json.optString("city", "Tokyo")
                 val hijri = json.optString("hijriDate", "")
                 val gregorian = json.optString("gregorianDate", "")
                 val isTomorrow = json.optBoolean("isTomorrowFajr", false)

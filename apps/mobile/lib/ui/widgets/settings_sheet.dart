@@ -4,16 +4,15 @@ import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
 const Map<String, List<String>> _popularLocations = {
-  'Denmark': [
-    'Ikast',
-    'Ejstrupholm',
-    'Copenhagen',
-    'Aarhus',
-    'Odense',
-    'Aalborg',
-    'Vejle',
-    'Horsens',
-    'Herning',
+  'Japan': [
+    'Tokyo',
+    'Osaka',
+    'Kyoto',
+    'Yokohama',
+    'Nagoya',
+    'Sapporo',
+    'Fukuoka',
+    'Kobe',
   ],
   'Türkiye': [
     'Istanbul',
@@ -69,6 +68,14 @@ const Map<String, List<String>> _popularLocations = {
     'Chicago',
     'Los Angeles',
     'Houston',
+  ],
+  'Denmark': [
+    'Copenhagen',
+    'Aarhus',
+    'Odense',
+    'Aalborg',
+    'Vejle',
+    'Esbjerg',
   ],
 };
 

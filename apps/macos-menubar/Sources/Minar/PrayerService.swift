@@ -16,7 +16,7 @@ public final class PrayerService: @unchecked Sendable {
     }
 
     public func fetchTimings(city: String, country: String, method: CalculationMethod) async throws -> PrayerSchedule {
-        // Diyanet: fetch official published calendar directly (e.g. Ikast Yatsı: 18:51)
+        // Diyanet: fetch official published calendar directly (e.g. Istanbul Yatsı: 18:51)
         if method == .diyanet {
             if let official = try? await fetchOfficialDiyanet(city: city, country: country) {
                 cache(official)
