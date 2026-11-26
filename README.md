@@ -1,178 +1,135 @@
 <div align="center">
 
-<img src="Resources/AppIcon-compressed.png" width="120" height="120" alt="Minar App Icon" />
-
 # Minar (مَنَارَة)
-### Prayer Times for macOS Menu Bar
+### Fast, Privacy-Focused Islamic Prayer Times & Native Widgets
 
-**Minar** is a lightweight, battery-optimised macOS menu bar app that shows Islamic prayer times (Salah times) with a live countdown — always visible, never in your way.
+**Minar** is a lightweight, ad-free, battery-optimized Islamic prayer times app available for **Android**, **iOS**, and **macOS Menu Bar**. Features precise astronomical calculations, official Diyanet timetables, live countdowns, persistent notification shade timetables, and four highly customizable native home screen widgets.
 
 <br/>
 
-<img src="Resources/app-screenshot.png" width="640" alt="Minar Menu Bar Screenshot" />
+[![GitHub Release](https://img.shields.io/github/v/release/liondepierre/Minar?color=4ADE80&logo=github&style=flat-square)](https://github.com/liondepierre/Minar/releases)
+[![Platform](https://img.shields.io/badge/platforms-Android%20%7C%20iOS%20%7C%20macOS-E8C582?style=flat-square)](#platforms)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![Zero Battery Drain](https://img.shields.io/badge/battery-0%25%20wakeups-emerald?style=flat-square)](#battery--performance)
+[![Privacy](https://img.shields.io/badge/privacy-100%25%20offline-60A5FA?style=flat-square)](#privacy)
 
 <br/>
 
 </div>
 
-> Built for Muslims who use a Mac and want accurate prayer times without opening a browser or a heavy app.
+---
+
+## 📱 Minar Mobile (Android & iOS)
+
+Built with Flutter and high-performance native Android AppWidget providers.
+
+### Key Highlights
+- **4 Native Home Screen Widgets**:
+  - **2x2 Next Prayer Card**: Large clock display, dynamic live countdown pill, NEXT/Tomorrow badge, and Hijri calendar date.
+  - **2x3 Panoramic Timetable**: Clean 6-cell grid with active prayer highlight that perfectly adapts to all launcher sizes.
+  - **Vertical Timetable List**: Clean daily prayer schedule with Turkish names and Arabic script (`الفجر`, `الشروق`, `الظهر`, `العصر`, `المغرب`, `العشاء`).
+  - **Minimal Bar Strip**: Compact single-row widget designed for minimal home screen layouts.
+- **Widget Customization**:
+  - **Themes**: *Midnight*, *AMOLED Black*, *Glass Frost*, and *Transparent*.
+  - **Accent Colors**: *Gold Warm*, *Emerald*, *Pure White*, and *Sky Blue*.
+  - **Font Size Scaling**: Standard, Large (+15%), and X-Large (+30%) with proportional auto-sizing.
+  - **Header Toggle**: Choose to show or hide the city name and Hijri date header bar.
+- **Pinned Notification Shade**:
+  - Persistent, non-intrusive timetable in your Android notification shade.
+  - Zero background battery drain (rendered as cached bitmaps, 0% CPU wakeups).
+  - 3 customizable rendering styles: *Table View*, *Compact Cards*, and *Minimal Strip*.
+- **Full App Theming**:
+  - 4 app background themes (*Midnight*, *AMOLED Black*, *Emerald Night*, *Royal Navy*).
+  - 5 vibrant accents (*Gold*, *Emerald*, *White*, *Sky Blue*, *Rose*).
+- **Intelligent Timetable**:
+  - Automatic transition to Tomorrow's Fajr schedule after Isha passes.
+  - Horizontal day swiping to preview upcoming prayer times.
+  - Offline timetable cache for uninterrupted access without network.
 
 ---
 
-## Features
+## 🖥️ Minar for macOS (Menu Bar)
 
-- **Live countdown** to the next prayer, updated every minute
-- **Six daily prayers** — Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha
-- **Turkish names** (İmsak, Güneş, Öğle, İkindi, Akşam, Yatsı) alongside Arabic transliterations
-- **Diyanet-official times** by default — fetched directly from the Turkish Directorate of Religious Affairs API for maximum accuracy
-- **Fallback calculation methods** — Muslim World League, ISNA, Umm Al-Qura (Makkah), Egyptian Authority
-- **Any city, any country** — change location at any time from the menu
-- **Launch at Login** toggle built in
-- **Battery-first design** — one network request per day, one CPU wake per minute, menu rebuilt only on prayer transitions (~6×/day)
-- **No account, no tracking, no ads** — fully offline after daily fetch
+A native Swift menu bar application for macOS.
+- **Glanceable Countdown**: Shows remaining time to next prayer directly in the macOS menu bar.
+- **Dropdown Schedule**: Click the 🕌 icon to see the full day's times and tomorrow's transition.
+- **Native & Lightweight**: Consumes only ~20 MB RAM and 0.0% CPU between minute ticks.
+- **Launch at Login**: Starts automatically on boot.
 
 ---
 
-## Requirements
+## 🕌 Calculation Methods
 
-| | |
+| Method | Region & Accuracy |
 |---|---|
-| **macOS** | 13 Ventura or later |
-| **Architecture** | Apple Silicon (arm64) + Intel (x86_64) universal |
+| **Diyanet (Türkiye)** *(Default)* | Türkiye, Balkans, Denmark, Germany, and throughout Europe |
+| **Muslim World League** | United Kingdom, Western Europe, Far East |
+| **ISNA** | North America (USA & Canada) |
+| **Umm Al-Qura (Makkah)** | Saudi Arabia, Gulf Countries |
+| **Egyptian General Authority** | Egypt, North Africa, Middle East |
+
+*Diyanet timings are fetched from official calendars; astronomical calculations use AlAdhan APIs and local offline astronomical algorithms.*
 
 ---
 
-## Installation
+## 📦 Installation & Download
 
-### Option A — Download the pre-built app (Recommended)
+### Android
+Download the latest APK release from the [GitHub Releases](https://github.com/liondepierre/Minar/releases) page:
+1. Download **`Minar-v1.1.0-android.apk`**.
+2. Tap the downloaded file to install on your Android device (enable "Install unknown apps" if prompted).
+3. Long-press your home screen to add any of the 4 Minar widgets.
 
-1. Download **`Minar.dmg`** from the [Releases](../../releases) page.
-2. Double-click **`Minar.dmg`** and drag **`Minar`** into your **Applications** folder.
-3. Open **Minar** from Applications or Spotlight. If macOS blocks first launch: **System Settings → Privacy & Security → Open Anyway**.
-4. The 🕌 icon appears in your menu bar immediately.
+### macOS
+1. Download **`Minar.dmg`** from [Releases](https://github.com/liondepierre/Minar/releases).
+2. Drag **`Minar`** into your **Applications** folder.
+3. Launch Minar from Applications or Spotlight.
 
-> **Tip:** First launch will ask for the city and country. Type any city name (e.g. `Tokyo`, `London`, `Istanbul`).
+---
 
-### Option B — Build from source
+## 🔒 Privacy & Battery Guarantee
 
+- **No tracking, no analytics, no ads, no accounts**: We don't want your data. Everything is calculated and stored locally on your device.
+- **Coarse Location**: Respects battery saver mode. Only requests low-power Wi-Fi/Cell network location fixes without continuous GPS tracking.
+- **Battery-First Architecture**: Zero background polling loops. Scheduled exact alarms wake the phone only at prayer boundaries to update widgets and notifications.
+
+---
+
+## 🛠️ Building from Source
+
+### Mobile App (Flutter)
 ```bash
 git clone https://github.com/liondepierre/Minar.git
-cd Minar
-swift build -c release
-# Or build a signed universal .app bundle:
-./scripts/bundle.sh
-open build/Minar.app
+cd Minar/apps/mobile
+flutter pub get
+flutter test
+flutter build apk --release
 ```
 
-Requires Xcode Command Line Tools (`xcode-select --install`).
-
----
-
-## Usage
-
-| Action | How |
-|---|---|
-| See next prayer & countdown | Glance at the menu bar |
-| See all today's times | Click the 🕌 icon |
-| Change prayer naming (Turkish / Arabic) | Menu → **Prayer Names** |
-| Check for new version | Menu → **Check for Updates...** |
-| Change city / country | Menu → **Change City / Country...** |
-| Change calculation method | Menu → **Calculation Method** |
-| Force refresh | Menu → **Refresh Now** |
-| Enable launch at login | Menu → **Launch at Login** (tick to enable) |
-| Quit | Menu → **Quit Minar** or ⌘Q |
-
----
-
-## Calculation Methods
-
-| Method | Best For |
-|---|---|
-| **Diyanet (Turkey)** *(default)* | Turkey, Balkans, Denmark, Germany, most of Europe |
-| Muslim World League | UK, Europe, Far East |
-| ISNA | North America |
-| Umm Al-Qura (Makkah) | Saudi Arabia, Gulf |
-| Egyptian Authority | Egypt, North Africa |
-
-Diyanet times are fetched directly from the official published calendar at **ezanvakti.imsakiyem.com**. All other methods use the **AlAdhan** astronomical API.
-
----
-
-## Privacy
-
-- **No data is collected.** Ever.
-- Your city and country are stored **locally** in `UserDefaults` on your own Mac.
-- The app makes **one outbound network request per day** to fetch prayer times for your chosen city. No other network activity.
-- No analytics, no crash reporting, no third-party SDKs.
-
----
-
-## Battery & Performance
-
-Minar is intentionally minimal:
-
-- **1 network request / day** — prayer times don't change intra-day
-- **1 CPU wake / minute** — aligned to the clock boundary, updates the countdown string
-- **~6 menu rebuilds / day** — only when the active prayer transitions
-- **~20–30 MB RAM** — static, does not grow over time
-- CPU usage in Activity Monitor: `0.0%` between ticks
-
----
-
-## Building & Distributing
-
+### macOS Menu Bar (Swift)
 ```bash
-# Debug build
-swift build
-
-# Universal release + signed .app + .zip
+cd Minar/apps/macos-menubar
+swift build -c release
 ./scripts/bundle.sh
-# Output: build/Minar.app  build/Minar.zip
 ```
-
-The bundle script signs with an ad-hoc certificate (`-s -`). For App Store or Gatekeeper-notarised distribution, replace with a Developer ID certificate.
 
 ---
 
-## Project Structure
+## 📂 Repository Layout
 
 ```
 Minar/
-├── Sources/Minar/
-│   ├── Minar.swift          # App delegate, menu bar UI, smart timer
-│   ├── PrayerService.swift  # Network fetching, caching, DTOs
-│   └── PrayerModel.swift    # Data types: Prayer, PrayerSchedule, CalculationMethod
-├── Tests/
-│   └── self_check.swift     # Live integration check (run with: swift Tests/self_check.swift)
-├── Resources/
-│   └── AppIcon.icns
-├── scripts/
-│   ├── bundle.sh            # Universal .app builder & signer
-│   └── generate_icon.swift  # Icon generation utility
-└── Package.swift
+├── apps/
+│   ├── mobile/             # Flutter mobile app (Android & iOS)
+│   │   ├── android/        # Native Kotlin AppWidget providers & notification services
+│   │   ├── lib/            # Flutter UI, controllers, and offline timetable models
+│   │   └── test/           # Unit and logic tests
+│   └── macos-menubar/      # Native Swift macOS menu bar application
+└── README.md
 ```
 
 ---
 
-## Contributing
+## 📄 License
 
-PRs welcome. Keep it lean — this app exists to do one thing well.
-Before opening a PR, run:
-```bash
-swift Tests/self_check.swift
-swift build
-```
-
----
-
-## About
-
-**Minar** (مَنَارَة) — from the Arabic for *minaret*, the tower from which the call to prayer is made. A fitting name for an app that lives at the top of your screen and marks the hours of prayer.
-
-Designed and built for personal use, then open-sourced so others can benefit.
-
-No AI will maintain this in the morning — the code is written to be read and modified by a human developer without assistance.
-
----
-
-*— YMA*
+Open-source and available under the [MIT License](LICENSE).
