@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg_midnight"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="8dp">
 
     <!-- Top Bar: City & Hijri (Toggleable) -->
     <LinearLayout
@@ -22,9 +22,10 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
+            android:singleLine="true"
             android:text="Minar • Ikast"
             android:textColor="#E8C582"
-            android:textSize="11sp"
+            android:textSize="10.5sp"
             android:textStyle="bold" />
 
         <TextView
@@ -33,9 +34,10 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
+            android:singleLine="true"
             android:text="16 Jumādá"
             android:textColor="#7E8EA6"
-            android:textSize="10sp" />
+            android:textSize="9.5sp" />
     </LinearLayout>
 
     <!-- Flexible spacer between header and middle content -->
@@ -57,39 +59,42 @@
             android:layout_height="wrap_content"
             android:background="@drawable/widget_pill_gold"
             android:maxLines="1"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="1.5dp"
+            android:singleLine="true"
+            android:paddingHorizontal="4.5dp"
+            android:paddingVertical="1dp"
             android:text="NEXT"
             android:textColor="#E8C582"
-            android:textSize="8.5sp"
+            android:textSize="8sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_next_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="5dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:singleLine="true"
             android:text="İMSAK"
             android:textColor="#F4DC9F"
-            android:textSize="15sp"
+            android:textSize="13.5sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Huge Time Display (Never truncated, never overlaps) -->
     <TextView
         android:id="@+id/widget_next_time"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="1dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         android:gravity="start|center_vertical"
         android:includeFontPadding="false"
         android:maxLines="1"
+        android:singleLine="true"
         android:text="06:05"
         android:textColor="#FFFFFF"
-        android:textSize="28sp"
+        android:textSize="26sp"
         android:textStyle="bold" />
 
     <!-- Flexible spacer between time and countdown pill -->
@@ -98,23 +103,24 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Bottom: Countdown Pill (Fixed at bottom) -->
+    <!-- Bottom: Countdown Pill (Fixed at bottom, never overlaps) -->
     <LinearLayout
         android:id="@+id/widget_next_remaining_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_pill_gold"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="2.5dp">
+        android:paddingHorizontal="7dp"
+        android:paddingVertical="2dp">
 
         <TextView
             android:id="@+id/widget_next_remaining"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:singleLine="true"
             android:text="in 9h 17m"
             android:textColor="#F4DC9F"
-            android:textSize="10.5sp"
+            android:textSize="9.5sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

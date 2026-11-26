@@ -182,21 +182,21 @@ object MinarWidgetHelper {
 
                 views.setTextViewText(R.id.widget_next_city, "Minar • $city")
                 views.setTextColor(R.id.widget_next_city, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_city, TypedValue.COMPLEX_UNIT_SP, 11f)
+                views.setTextViewTextSize(R.id.widget_next_city, TypedValue.COMPLEX_UNIT_SP, 10.5f)
 
                 views.setTextViewText(R.id.widget_next_hijri, shortHijri)
-                views.setTextViewTextSize(R.id.widget_next_hijri, TypedValue.COMPLEX_UNIT_SP, 10f)
+                views.setTextViewTextSize(R.id.widget_next_hijri, TypedValue.COMPLEX_UNIT_SP, 9.5f)
+
+                val (nameSize, timeSize, remSize) = when (textSizeMode) {
+                    "xlarge" -> Triple(14f, 27f, 10f)
+                    "large" -> Triple(13.5f, 25f, 9.5f)
+                    else -> Triple(13f, 23f, 9f)
+                }
 
                 views.setTextViewText(R.id.widget_next_name, nextName.uppercase())
                 views.setTextColor(R.id.widget_next_name, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_name, TypedValue.COMPLEX_UNIT_SP, 15f)
+                views.setTextViewTextSize(R.id.widget_next_name, TypedValue.COMPLEX_UNIT_SP, nameSize)
 
-                // 28sp / 30sp / 32sp: always fits in 2x2 widget width without clipping last digit
-                val timeSize = when (textSizeMode) {
-                    "xlarge" -> 32f
-                    "large" -> 30f
-                    else -> 28f
-                }
                 views.setTextViewText(R.id.widget_next_time, nextTime)
                 views.setTextViewTextSize(R.id.widget_next_time, TypedValue.COMPLEX_UNIT_SP, timeSize)
                 views.setTextColor(R.id.widget_next_time, 0xFFFFFFFF.toInt())
@@ -205,13 +205,13 @@ object MinarWidgetHelper {
                 views.setTextViewText(R.id.widget_next_badge, badgeText)
                 views.setInt(R.id.widget_next_badge, "setBackgroundResource", style.accent.pillRes)
                 views.setTextColor(R.id.widget_next_badge, style.accent.accentColor)
-                views.setTextViewTextSize(R.id.widget_next_badge, TypedValue.COMPLEX_UNIT_SP, 8.5f)
+                views.setTextViewTextSize(R.id.widget_next_badge, TypedValue.COMPLEX_UNIT_SP, 8f)
 
                 if (nextRemaining.isNotEmpty()) {
                     views.setTextViewText(R.id.widget_next_remaining, "in $nextRemaining")
                     views.setInt(R.id.widget_next_remaining_container, "setBackgroundResource", style.accent.pillRes)
                     views.setTextColor(R.id.widget_next_remaining, style.accent.accentLightColor)
-                    views.setTextViewTextSize(R.id.widget_next_remaining, TypedValue.COMPLEX_UNIT_SP, 10.5f)
+                    views.setTextViewTextSize(R.id.widget_next_remaining, TypedValue.COMPLEX_UNIT_SP, remSize)
                     views.setViewVisibility(R.id.widget_next_remaining_container, View.VISIBLE)
                 } else {
                     views.setViewVisibility(R.id.widget_next_remaining_container, View.GONE)
@@ -270,11 +270,10 @@ object MinarWidgetHelper {
                     R.id.widget_time_3, R.id.widget_time_4, R.id.widget_time_5
                 )
 
-                // Precisely scaled so name + time NEVER overflow the cell highlight when adjusted smaller
                 val (nameSize, timeSize) = when (textSizeMode) {
-                    "xlarge" -> Pair(10f, 16f)
-                    "large" -> Pair(9.5f, 15.5f)
-                    else -> Pair(9f, 14.5f)
+                    "xlarge" -> Pair(9f, 13.5f)
+                    "large" -> Pair(8.5f, 13f)
+                    else -> Pair(8f, 12.5f)
                 }
 
                 for (i in 0 until minOf(prayers.length(), 6)) {
@@ -362,9 +361,9 @@ object MinarWidgetHelper {
                 )
 
                 val (vNameSize, vSubSize, vTimeSize) = when (textSizeMode) {
-                    "xlarge" -> Triple(13.5f, 11.5f, 15.5f)
-                    "large" -> Triple(13f, 11f, 15f)
-                    else -> Triple(12.5f, 10.5f, 14.5f)
+                    "xlarge" -> Triple(12f, 9.5f, 13.5f)
+                    "large" -> Triple(11.5f, 9f, 13f)
+                    else -> Triple(11f, 8.5f, 12.5f)
                 }
 
                 val englishSubs = arrayOf("Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha")
@@ -437,9 +436,9 @@ object MinarWidgetHelper {
                 )
 
                 val (barNameSize, barTimeSize) = when (textSizeMode) {
-                    "xlarge" -> Pair(9.5f, 12f)
-                    "large" -> Pair(9f, 11.5f)
-                    else -> Pair(8.5f, 11f)
+                    "xlarge" -> Pair(8.5f, 11f)
+                    "large" -> Pair(8f, 10.5f)
+                    else -> Pair(7.5f, 10f)
                 }
 
                 for (i in 0 until minOf(prayers.length(), 6)) {

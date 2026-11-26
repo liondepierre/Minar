@@ -6,11 +6,7 @@ RES_DIR="$(dirname "$0")/../android/app/src/main/res"
 IOS_DIR="$(dirname "$0")/../ios/Runner/Assets.xcassets/AppIcon.appiconset"
 
 echo "Generating Android Mipmaps from $SRC_ICON..."
-sips -z 48 48     "$SRC_ICON" --out "$RES_DIR/mipmap-mdpi/ic_launcher.png" >/dev/null
-sips -z 72 72     "$SRC_ICON" --out "$RES_DIR/mipmap-hdpi/ic_launcher.png" >/dev/null
-sips -z 96 96     "$SRC_ICON" --out "$RES_DIR/mipmap-xhdpi/ic_launcher.png" >/dev/null
-sips -z 144 144   "$SRC_ICON" --out "$RES_DIR/mipmap-xxhdpi/ic_launcher.png" >/dev/null
-sips -z 192 192   "$SRC_ICON" --out "$RES_DIR/mipmap-xxxhdpi/ic_launcher.png" >/dev/null
+python3 "$(dirname "$0")/generate_android_adaptive_icons.py"
 
 echo "Generating iOS AppIcons..."
 sips -z 40 40     "$SRC_ICON" --out "$IOS_DIR/Icon-App-20x20@2x.png" >/dev/null

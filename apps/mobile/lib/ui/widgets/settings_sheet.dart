@@ -196,11 +196,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
     required bool selected,
     required VoidCallback onTap,
   }) {
+    final zoom = widget.controller.zoomEnhanced;
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: zoom ? 12 : 10),
           decoration: BoxDecoration(
             color: selected
                 ? MinarTheme.goldWarm.withOpacity(0.16)
@@ -218,7 +219,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
             children: [
               Icon(
                 icon,
-                size: 16,
+                size: zoom ? 18 : 16,
                 color: selected ? MinarTheme.goldWarm : MinarTheme.textSecondary,
               ),
               const SizedBox(height: 6),
@@ -284,19 +285,25 @@ class _SettingsSheetState extends State<SettingsSheet> {
       listenable: widget.controller,
       builder: (context, _) {
         final c = widget.controller;
+        final zoom = c.zoomEnhanced;
+        final textScale = zoom ? 1.25 : 1.0;
         final isCustomCountry = _selectedCountry == _kOtherCountry;
         final isCustomCity = _selectedCity == _kOtherCity;
 
-        return SafeArea(
-          top: true,
-          bottom: false,
-          child: Container(
-            margin: const EdgeInsets.only(top: 36),
-            decoration: BoxDecoration(
-              color: MinarTheme.surfaceSolid,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+          ),
+          child: SafeArea(
+            top: true,
+            bottom: false,
+            child: Container(
+              margin: EdgeInsets.only(top: zoom ? 28 : 36),
+              decoration: BoxDecoration(
+                color: MinarTheme.surfaceSolid,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Pinned Drag Handle & Header (Pinned at top, outside scroll view)
@@ -1314,6 +1321,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
     ],
   ),
 ),
+),
 );
       },
     );
@@ -1486,54 +1494,59 @@ class _SettingsSheetState extends State<SettingsSheet> {
   void _checkForUpdates(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: MinarTheme.surfaceSolid,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: MinarTheme.borderFaint),
+      builder: (ctx) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(
+          textScaler: TextScaler.linear(widget.controller.zoomEnhanced ? 1.25 : 1.0),
         ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: MinarTheme.surfaceSubtle,
-                borderRadius: BorderRadius.circular(10),
+        child: AlertDialog(
+          backgroundColor: MinarTheme.surfaceSolid,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: MinarTheme.borderFaint),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: MinarTheme.surfaceSubtle,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.check_circle_outline_rounded,
+                    color: Colors.greenAccent, size: 22),
               ),
-              child: const Icon(Icons.check_circle_outline_rounded,
-                  color: Colors.greenAccent, size: 22),
-            ),
-            const SizedBox(width: 12),
-            const Text('Up to Date',
-                style: TextStyle(
-                    color: MinarTheme.textPrimary,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Minar v1.0.0 (Build 1) is currently the latest release.',
-                style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
-            SizedBox(height: 10),
-            Text(
-              """• Local Diyanet & AlAdhan timing engine active
+              const SizedBox(width: 12),
+              const Text('Up to Date',
+                  style: TextStyle(
+                      color: MinarTheme.textPrimary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Minar v1.1.0 (Build 2) is currently the latest release.',
+                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
+              SizedBox(height: 10),
+              Text(
+                """• Local Diyanet & AlAdhan timing engine active
 • 4 native home screen widgets synchronized
 • Battery-efficient offline timetable loaded
 • GitHub: liondepierre/Minar""",
-              style: TextStyle(color: MinarTheme.textSecondary, fontSize: 12, height: 1.45),
+                style: TextStyle(color: MinarTheme.textSecondary, fontSize: 12, height: 1.45),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-        ],
       ),
     );
   }
