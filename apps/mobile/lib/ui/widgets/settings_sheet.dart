@@ -955,9 +955,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 18),
 
                 // App Theme & Accent Customization
-                const Text(
-                  'APP THEME & ACCENT',
-                  style: TextStyle(
+                Text(
+                  c.strings.appearanceTheme,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -967,9 +967,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 10),
 
                 // App Theme Mode Picker
-                const Text(
-                  'App Theme Palette',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                Text(
+                  c.strings.appThemePalette,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 SingleChildScrollView(
@@ -989,9 +989,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 12),
 
                 // App Accent Color Picker
-                const Text(
-                  'App Accent Color',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                Text(
+                  c.strings.appAccentColor,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 SingleChildScrollView(
@@ -1013,9 +1013,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 18),
 
                 // Home Screen Widgets Customization
-                const Text(
-                  'HOME SCREEN WIDGETS',
-                  style: TextStyle(
+                Text(
+                  c.strings.homeScreenWidgets,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -1025,9 +1025,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 10),
 
                 // Widget Theme Picker (Midnight, AMOLED, Glass, Transparent)
-                const Text(
-                  'Background Style',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                Text(
+                  c.strings.backgroundStyle,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 SingleChildScrollView(
@@ -1047,9 +1047,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 12),
 
                 // Widget Accent Picker (Gold, Emerald, White, Sky Blue)
-                const Text(
-                  'Accent Color',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                Text(
+                  c.strings.accentColor,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 SingleChildScrollView(
@@ -1071,11 +1071,11 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 // Show Header Switch
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Show Header in Widgets',
-                      style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13)),
-                  subtitle: const Text(
-                    'Display location and Hijri date header bar',
-                    style: TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
+                  title: Text(c.strings.showHeaderInWidgets,
+                      style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13)),
+                  subtitle: Text(
+                    c.strings.showHeaderCaption,
+                    style: const TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
                   ),
                   value: c.widgetShowHeader,
                   activeColor: MinarTheme.goldWarm,
@@ -1084,20 +1084,20 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 8),
 
                 // Widget Font Size (Standard, Large +15%, X-Large +30%)
-                const Text(
-                  'Widget Font Size',
-                  style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                Text(
+                  c.strings.widgetFontSize,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildTextSizeChip('Standard', 'standard', c),
+                      _buildTextSizeChip(c.strings.standard, 'standard', c),
                       const SizedBox(width: 8),
-                      _buildTextSizeChip('Large (+15%)', 'large', c),
+                      _buildTextSizeChip(c.strings.large, 'large', c),
                       const SizedBox(width: 8),
-                      _buildTextSizeChip('X-Large (+30%)', 'xlarge', c),
+                      _buildTextSizeChip(c.strings.xlarge, 'xlarge', c),
                     ],
                   ),
                 ),
@@ -1105,9 +1105,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 18),
 
                 // App Typography (7 Fonts with Live Previews)
-                const Text(
-                  'TYPOGRAPHY',
-                  style: TextStyle(
+                Text(
+                  c.strings.typography,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -1194,9 +1194,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 12),
 
                 // Cache & Storage
-                const Text(
-                  'CACHE & STORAGE',
-                  style: TextStyle(
+                Text(
+                  c.strings.cacheAndStorage,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -1207,14 +1207,14 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Offline Schedule',
-                            style: TextStyle(
+                        Text(c.strings.offlineSchedule,
+                            style: const TextStyle(
                                 color: MinarTheme.textPrimary, fontSize: 14)),
-                        Text('Saved locally for zero-network use',
-                            style: TextStyle(
+                        Text(c.strings.offlineScheduleCaption,
+                            style: const TextStyle(
                                 color: MinarTheme.textSecondary, fontSize: 11)),
                       ],
                     ),
@@ -1275,17 +1275,17 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                             color: Colors.greenAccent)),
                                   ],
                                 )
-                              : const Text('Re-sync',
-                                  style: TextStyle(fontSize: 12)),
+                              : Text(c.strings.resync,
+                                  style: const TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
                 // ABOUT & UPDATES
-                const Text(
-                  'ABOUT & UPDATES',
-                  style: TextStyle(
+                Text(
+                  c.strings.aboutAndUpdates,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -1317,22 +1317,22 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 color: MinarTheme.goldWarm, size: 24),
                           ),
                           const SizedBox(width: 14),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Minar Prayer Times',
-                                  style: TextStyle(
+                                  c.strings.minarPrayerTimes,
+                                  style: const TextStyle(
                                     color: MinarTheme.textPrimary,
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 3),
+                                const SizedBox(height: 3),
                                 Text(
                                   'Version $kAppVersion (Build $kAppBuild) • Open Source',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: MinarTheme.textSecondary,
                                     fontSize: 12,
                                   ),
@@ -1348,8 +1348,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         child: ElevatedButton.icon(
                           onPressed: () => _checkForUpdates(context),
                           icon: const Icon(Icons.sync_rounded, size: 16),
-                          label: const Text('Check for updates',
-                              style: TextStyle(
+                          label: Text(c.strings.checkForUpdates,
+                              style: const TextStyle(
                                   fontSize: 13, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MinarTheme.goldWarm,
@@ -1645,8 +1645,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   ),
                 ),
                 SizedBox(width: 16),
-                Text('Checking GitHub...',
-                    style: TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
+                Text(widget.controller.strings.checkingGithub,
+                    style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13.5)),
               ],
             ),
           ),
@@ -1717,7 +1717,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    isNewer ? 'Update Available' : 'Up to Date',
+                    isNewer ? widget.controller.strings.updateAvailable : widget.controller.strings.upToDate,
                     style: const TextStyle(
                       color: MinarTheme.textPrimary,
                       fontSize: 17,
@@ -1764,7 +1764,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       _openUrl(apkUrl!);
                     },
                     style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
-                    child: const Text('Download APK', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(widget.controller.strings.downloadApk, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 TextButton(
                   onPressed: () {
@@ -1776,7 +1776,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   style: TextButton.styleFrom(
                     foregroundColor: isNewer ? MinarTheme.textSecondary : MinarTheme.goldWarm,
                   ),
-                  child: Text(isNewer ? 'Later' : 'OK', style: const TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text(isNewer ? widget.controller.strings.later : widget.controller.strings.ok, style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
