@@ -14,6 +14,7 @@ class StorageService {
   static const String _kCachedSchedule = 'minar_cached_schedule';
   static const String _kCachedWeeklySchedule = 'minar_cached_weekly_schedule';
   static const String _kZoomEnhanced = 'minar_zoom_enhanced';
+  static const String _kZoomLevel = 'minar_zoom_level';
   static const String _kAutoLocation = 'minar_auto_location';
   static const String _kPinnedNotification = 'minar_pinned_notification';
   static const String _kPinnedStyle = 'minar_pinned_style';
@@ -65,8 +66,22 @@ class StorageService {
   set notificationsEnabled(bool value) =>
       _prefs.setBool(_kNotifications, value);
 
-  bool get zoomEnhanced => _prefs.getBool(_kZoomEnhanced) ?? false;
-  set zoomEnhanced(bool value) => _prefs.setBool(_kZoomEnhanced, value);
+  bool get zoomEnhanced => zoomLevel != 'standard';
+  set zoomEnhanced(bool value) {
+    _prefs.setBool(_kZoomEnhanced, value);
+    _prefs.setString(_kZoomLevel, value ? 'large' : 'standard');
+  }
+
+  String get zoomLevel {
+    final saved = _prefs.getString(_kZoomLevel);
+    if (saved != null) return saved;
+    return (_prefs.getBool(_kZoomEnhanced) ?? false) ? 'large' : 'standard';
+  }
+
+  set zoomLevel(String value) {
+    _prefs.setString(_kZoomLevel, value);
+    _prefs.setBool(_kZoomEnhanced, value != 'standard');
+  }
 
   bool get autoLocationEnabled => _prefs.getBool(_kAutoLocation) ?? true;
   set autoLocationEnabled(bool value) => _prefs.setBool(_kAutoLocation, value);

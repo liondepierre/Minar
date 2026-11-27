@@ -34,6 +34,9 @@ class PrayerController extends ChangeNotifier {
         _storage.cachedSchedule ??
         defaultSchedule(city, country);
     _startTicker();
+    if (notificationsEnabled || pinnedNotificationEnabled) {
+      _notifications.requestPermissions();
+    }
     fetchSchedule();
   }
 
@@ -110,6 +113,10 @@ class PrayerController extends ChangeNotifier {
   bool get useTurkish => _storage.useTurkishNames;
   bool get notificationsEnabled => _storage.notificationsEnabled;
   bool get zoomEnhanced => _storage.zoomEnhanced;
+  String get zoomLevel => _storage.zoomLevel;
+  double get zoomScale => zoomLevel == 'xlarge'
+      ? 1.25
+      : (zoomLevel == 'large' ? 1.15 : 1.0);
   bool get autoLocation => _storage.autoLocationEnabled;
   String get locationMode => _storage.locationMode;
   bool get pinnedNotificationEnabled => _storage.pinnedNotificationEnabled;
@@ -204,8 +211,8 @@ class PrayerController extends ChangeNotifier {
     final eff = weekly.effectiveSchedule();
 
     if (notificationsEnabled) {
-      await _notifications.schedulePrayerReminders(
-        eff,
+      await _notifications.scheduleWeeklyPrayerReminders(
+        weekly,
         useTurkish: useTurkish,
       );
     }
@@ -333,6 +340,16 @@ class PrayerController extends ChangeNotifier {
   void toggleZoomEnhanced() {
     _storage.zoomEnhanced = !_storage.zoomEnhanced;
     notifyListeners();
+  }
+
+  void setZoomLevel(String level) {
+    _storage.zoomLevel = level;
+    notifyListeners();
+  }
+
+  Future<void> sendTestNotification() async {
+    await _notifications.requestPermissions();
+    await _notifications.sendTestNotification(useTurkish: useTurkish);
   }
 
   Future<bool> updateLocation({
@@ -563,12 +580,19 @@ class PrayerController extends ChangeNotifier {
 
   Future<void> toggleNotifications() async {
     _storage.notificationsEnabled = !_storage.notificationsEnabled;
-    if (_storage.notificationsEnabled && _schedule != null) {
+    if (_storage.notificationsEnabled) {
       await _notifications.requestPermissions();
-      await _notifications.schedulePrayerReminders(
-        effectiveSchedule,
-        useTurkish: useTurkish,
-      );
+      if (_weeklySchedule != null) {
+        await _notifications.scheduleWeeklyPrayerReminders(
+          _weeklySchedule!,
+          useTurkish: useTurkish,
+        );
+      } else if (_schedule != null) {
+        await _notifications.schedulePrayerReminders(
+          effectiveSchedule,
+          useTurkish: useTurkish,
+        );
+      }
     } else {
       await _notifications.cancelAll();
     }

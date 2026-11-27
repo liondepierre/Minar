@@ -1,7 +1,7 @@
 name: minar_mobile
 description: "Minar - Pure, distraction-free Islamic prayer times for mobile."
 publish_to: 'none'
-version: 1.1.4+5
+version: 1.1.5+6
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

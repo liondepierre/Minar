@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../models/prayer_schedule.dart';
+import '../models/weekly_schedule.dart';
 import '../ui/theme.dart';
 import 'notification_card_renderer.dart';
 
@@ -39,6 +40,15 @@ class NotificationService {
 
       await _plugin.initialize(initSettings);
       tz.initializeTimeZones();
+      if (Platform.isAndroid) {
+        try {
+          final tzName =
+              await _nativeChannel.invokeMethod<String>('getLocalTimeZone');
+          if (tzName != null && tzName.isNotEmpty) {
+            tz.setLocalLocation(tz.getLocation(tzName));
+          }
+        } catch (_) {}
+      }
       final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       await androidPlugin?.deleteNotificationChannel('minar_pinned_channel');
@@ -193,6 +203,114 @@ class NotificationService {
     } catch (_) {}
   }
 
+  Future<void> sendTestNotification({required bool useTurkish}) async {
+    try {
+      if (!_isInitialized) await init();
+      if (!_isInitialized) return;
+
+      const androidDetails = AndroidNotificationDetails(
+        'minar_prayer_channel',
+        'Minar Prayer Notifications',
+        channelDescription: 'Notifications for daily salah prayer times',
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      const darwinDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: true,
+      );
+
+      final title =
+          useTurkish ? 'Minar Test Bildirimi' : 'Minar Test Notification';
+      final body = useTurkish
+          ? 'Ezan ve namaz vakti bildirimleri düzgün çalışıyor.'
+          : 'Salah prayer notifications are working properly.';
+
+      await _plugin.show(
+        999,
+        title,
+        body,
+        const NotificationDetails(android: androidDetails, iOS: darwinDetails),
+      );
+    } catch (_) {}
+  }
+
+  Future<void> scheduleWeeklyPrayerReminders(
+    WeeklySchedule weekly, {
+    required bool useTurkish,
+  }) async {
+    try {
+      if (!_isInitialized) await init();
+      if (!_isInitialized) return;
+
+      // Cancel previous prayer reminder notifications (IDs 0..70)
+      for (int i = 0; i <= 70; i++) {
+        await _plugin.cancel(i);
+      }
+
+      final now = DateTime.now();
+
+      const androidDetails = AndroidNotificationDetails(
+        'minar_prayer_channel',
+        'Minar Prayer Notifications',
+        channelDescription: 'Notifications for daily salah prayer times',
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      const darwinDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: true,
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: darwinDetails,
+        macOS: darwinDetails,
+      );
+
+      // Iterate through the week's days and schedule all upcoming prayers
+      for (int dayIdx = 0; dayIdx < weekly.days.length; dayIdx++) {
+        final daySchedule = weekly.days[dayIdx];
+        for (int pIdx = 0; pIdx < daySchedule.items.length; pIdx++) {
+          final item = daySchedule.items[pIdx];
+          if (item.dateTime.isAfter(now)) {
+            final prayerName = item.type.displayName(useTurkish: useTurkish);
+            final title = '$prayerName (${item.time})';
+            final body = 'Time for $prayerName prayer.';
+
+            final scheduledTz = tz.TZDateTime(
+              tz.local,
+              item.dateTime.year,
+              item.dateTime.month,
+              item.dateTime.day,
+              item.dateTime.hour,
+              item.dateTime.minute,
+            );
+
+            final notifId = dayIdx * 10 + pIdx;
+
+            await _plugin.zonedSchedule(
+              notifId,
+              title,
+              body,
+              scheduledTz,
+              notificationDetails,
+              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+              uiLocalNotificationDateInterpretation:
+                  UILocalNotificationDateInterpretation.absoluteTime,
+            );
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   Future<void> schedulePrayerReminders(
     PrayerSchedule schedule, {
     required bool useTurkish,
@@ -236,7 +354,14 @@ class NotificationService {
             macOS: darwinDetails,
           );
 
-          final scheduledTz = tz.TZDateTime.from(item.dateTime, tz.local);
+          final scheduledTz = tz.TZDateTime(
+            tz.local,
+            item.dateTime.year,
+            item.dateTime.month,
+            item.dateTime.day,
+            item.dateTime.hour,
+            item.dateTime.minute,
+          );
 
           await _plugin.zonedSchedule(
             i,

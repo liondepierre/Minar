@@ -409,7 +409,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       sliver: SliverToBoxAdapter(
                         child: SizedBox(
-                          height: c.zoomEnhanced ? 440 : 365,
+                          height: c.zoomLevel == 'xlarge'
+                              ? 450
+                              : (c.zoomLevel == 'large' ? 415 : 365),
                           child: PageView.builder(
                             controller: _pageController,
                             itemCount: daysCount,

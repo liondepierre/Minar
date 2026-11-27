@@ -6,8 +6,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.4';
-const int kAppBuild = 5;
+const String kAppVersion = '1.1.5';
+const int kAppBuild = 6;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -300,7 +300,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
       builder: (context, _) {
         final c = widget.controller;
         final zoom = c.zoomEnhanced;
-        final textScale = zoom ? 1.25 : 1.0;
+        final textScale = c.zoomScale;
         final isCustomCountry = _selectedCountry == _kOtherCountry;
         final isCustomCity = _selectedCity == _kOtherCity;
 
@@ -853,20 +853,72 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   activeColor: MinarTheme.goldWarm,
                   onChanged: (_) => c.toggleTurkishNames(),
                 ),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(c.strings.zoomEnhancedMode,
-                      style: const TextStyle(
-                          color: MinarTheme.textPrimary, fontSize: 14)),
-                  subtitle: Text(
-                    c.strings.zoomEnhancedCaption,
-                    style:
-                        const TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
-                  ),
-                  value: c.zoomEnhanced,
-                  activeColor: MinarTheme.goldWarm,
-                  onChanged: (_) => c.toggleZoomEnhanced(),
+                const SizedBox(height: 6),
+                Text(
+                  c.strings.zoomEnhancedMode,
+                  style: const TextStyle(
+                      color: MinarTheme.textPrimary, fontSize: 14),
                 ),
+                const SizedBox(height: 2),
+                Text(
+                  c.strings.zoomEnhancedCaption,
+                  style: const TextStyle(
+                      color: MinarTheme.textSecondary, fontSize: 11),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: MinarTheme.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: MinarTheme.borderFaint),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: const ['standard', 'large', 'xlarge']
+                              .contains(c.zoomLevel)
+                          ? c.zoomLevel
+                          : 'standard',
+                      isExpanded: true,
+                      dropdownColor: MinarTheme.surfaceSolid,
+                      icon: Icon(Icons.arrow_drop_down,
+                          color: MinarTheme.goldWarm),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'standard',
+                          child: Text(
+                            '${c.strings.standard} (100%)',
+                            style: const TextStyle(
+                                color: MinarTheme.textPrimary, fontSize: 13),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'large',
+                          child: Text(
+                            c.strings.large,
+                            style: const TextStyle(
+                                color: MinarTheme.textPrimary, fontSize: 13),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'xlarge',
+                          child: Text(
+                            c.strings.xlarge,
+                            style: const TextStyle(
+                                color: MinarTheme.textPrimary, fontSize: 13),
+                          ),
+                        ),
+                      ],
+                      onChanged: (lvl) {
+                        if (lvl != null) {
+                          c.setZoomLevel(lvl);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: Text(c.strings.prayerNotifications,
@@ -881,6 +933,42 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   activeColor: MinarTheme.goldWarm,
                   onChanged: (_) => c.toggleNotifications(),
                 ),
+                if (c.notificationsEnabled) ...[
+                  const SizedBox(height: 2),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: MinarTheme.goldWarm,
+                        side: BorderSide(
+                            color: MinarTheme.goldWarm.withOpacity(0.5)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(Icons.notifications_active, size: 16),
+                      label: Text(
+                        c.strings.sendTestNotification,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      onPressed: () async {
+                        await c.sendTestNotification();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(c.strings.testNotificationSent),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                ],
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: Text(c.strings.pinnedShadeNotification,
@@ -1691,7 +1779,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
           context: context,
           builder: (ctx) => MediaQuery(
             data: MediaQuery.of(ctx).copyWith(
-              textScaler: TextScaler.linear(widget.controller.zoomEnhanced ? 1.25 : 1.0),
+              textScaler: TextScaler.linear(widget.controller.zoomScale),
             ),
             child: AlertDialog(
               backgroundColor: MinarTheme.surfaceSolid,

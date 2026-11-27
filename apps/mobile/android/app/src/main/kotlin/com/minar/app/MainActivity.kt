@@ -149,6 +149,9 @@ class MainActivity : FlutterActivity() {
                         cancelTableNotification(this)
                         result.success(true)
                     }
+                    "getLocalTimeZone" -> {
+                        result.success(java.util.TimeZone.getDefault().id)
+                    }
                     else -> result.notImplemented()
                 }
             }

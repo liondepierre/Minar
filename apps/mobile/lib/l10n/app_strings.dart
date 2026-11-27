@@ -489,4 +489,20 @@ class AppStrings {
         'ar' => 'جاري تحديث مواقيت الصلاة...',
         _ => 'Updating prayer times...',
       };
+
+  String get sendTestNotification => switch (code) {
+        'tr' => 'Test Bildirimi Gönder',
+        'da' => 'Send testnotifikation',
+        'de' => 'Testbenachrichtigung senden',
+        'ar' => 'إرسال إشعار تجريبي',
+        _ => 'Send Test Notification',
+      };
+
+  String get testNotificationSent => switch (code) {
+        'tr' => 'Test bildirimi gönderildi',
+        'da' => 'Testnotifikation sendt',
+        'de' => 'Testbenachrichtigung gesendet',
+        'ar' => 'تم إرسال إشعار الاختبار',
+        _ => 'Test notification sent',
+      };
 }
