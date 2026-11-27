@@ -35,10 +35,24 @@ class MainActivity : FlutterActivity() {
         private const val PINNED_CHANNEL_ID = "minar_pinned_v4"
 
         var lastTableBytes: ByteArray? = null
+        var lastCompactBytes: ByteArray? = null
+        var lastExpandedBytes: ByteArray? = null
 
-        fun postTableNotification(context: Context, pngBytes: ByteArray) {
-            lastTableBytes = pngBytes
-            val bitmap = BitmapFactory.decodeByteArray(pngBytes, 0, pngBytes.size) ?: return
+        fun postTableNotification(
+            context: Context,
+            bytes: ByteArray? = null,
+            compactBytes: ByteArray? = null,
+            expandedBytes: ByteArray? = null
+        ) {
+            val effCompact = compactBytes ?: bytes ?: return
+            val effExpanded = expandedBytes ?: bytes ?: effCompact
+
+            lastCompactBytes = effCompact
+            lastExpandedBytes = effExpanded
+            lastTableBytes = effExpanded
+
+            val compactBitmap = BitmapFactory.decodeByteArray(effCompact, 0, effCompact.size) ?: return
+            val expandedBitmap = BitmapFactory.decodeByteArray(effExpanded, 0, effExpanded.size) ?: return
             val nm = NotificationManagerCompat.from(context)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -76,16 +90,19 @@ class MainActivity : FlutterActivity() {
                 PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
             )
 
-            val remoteView = RemoteViews(context.packageName, R.layout.notification_table)
-            remoteView.setImageViewBitmap(R.id.notification_table_image, bitmap)
+            val compactView = RemoteViews(context.packageName, R.layout.notification_compact)
+            compactView.setImageViewBitmap(R.id.notification_compact_image, compactBitmap)
+
+            val expandedView = RemoteViews(context.packageName, R.layout.notification_expanded)
+            expandedView.setImageViewBitmap(R.id.notification_expanded_image, expandedBitmap)
 
             val transparentLargeIcon = android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.ARGB_8888)
 
             val builder = NotificationCompat.Builder(context, PINNED_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notif_transparent)
                 .setLargeIcon(transparentLargeIcon)
-                .setCustomContentView(remoteView)
-                // Intentionally NO setCustomBigContentView -> removes expand/collapse chevron button!
+                .setCustomContentView(compactView)
+                .setCustomBigContentView(expandedView)
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .setSilent(true)
@@ -109,6 +126,8 @@ class MainActivity : FlutterActivity() {
 
         fun cancelTableNotification(context: Context) {
             lastTableBytes = null
+            lastCompactBytes = null
+            lastExpandedBytes = null
             val nm = NotificationManagerCompat.from(context)
             nm.cancel(PINNED_NOTIF_ID)
         }
@@ -138,8 +157,10 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "showPinnedTable" -> {
                         val bytes = call.argument<ByteArray>("bytes")
-                        if (bytes != null) {
-                            postTableNotification(this, bytes)
+                        val compactBytes = call.argument<ByteArray>("compactBytes")
+                        val expandedBytes = call.argument<ByteArray>("expandedBytes")
+                        if (compactBytes != null || expandedBytes != null || bytes != null) {
+                            postTableNotification(this, bytes, compactBytes, expandedBytes)
                             result.success(true)
                         } else {
                             result.error("INVALID_ARGS", "Missing image bytes", null)
@@ -192,6 +213,81 @@ class MainActivity : FlutterActivity() {
                     result.notImplemented()
                 }
             }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.minar.app/updater")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getCacheDir" -> {
+                        result.success(cacheDir.absolutePath)
+                    }
+                    "canRequestPackageInstalls" -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            result.success(packageManager.canRequestPackageInstalls())
+                        } else {
+                            result.success(true)
+                        }
+                    }
+                    "openInstallPermissionSettings" -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            try {
+                                val intent = Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                                    data = Uri.parse("package:$packageName")
+                                }
+                                startActivity(intent)
+                                result.success(true)
+                            } catch (e: Exception) {
+                                result.error("SETTINGS_ERROR", e.message, null)
+                            }
+                        } else {
+                            result.success(false)
+                        }
+                    }
+                    "installApk" -> {
+                        val filePath = call.argument<String>("filePath")
+                        if (filePath != null) {
+                            installApk(filePath, result)
+                        } else {
+                            result.error("INVALID_ARGS", "Missing filePath", null)
+                        }
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+    }
+
+    private fun installApk(filePath: String, result: MethodChannel.Result) {
+        try {
+            val file = java.io.File(filePath)
+            if (!file.exists()) {
+                result.error("FILE_NOT_FOUND", "APK file does not exist", null)
+                return
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (!packageManager.canRequestPackageInstalls()) {
+                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                    result.success(false)
+                    return
+                }
+            }
+
+            val contentUri = androidx.core.content.FileProvider.getUriForFile(
+                this,
+                "$packageName.fileprovider",
+                file
+            )
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(contentUri, "application/vnd.android.package-archive")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            startActivity(intent)
+            result.success(true)
+        } catch (e: Exception) {
+            result.error("INSTALL_ERROR", e.message, null)
+        }
     }
 
     private fun handleCoarseLocationRequest() {

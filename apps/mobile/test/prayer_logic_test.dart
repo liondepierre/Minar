@@ -220,9 +220,8 @@ void main() {
       expect(minimalBytes!.lengthInBytes, greaterThan(1000));
     });
 
-    test('WeeklySchedule correctly switches effectiveSchedule to tomorrow after Isha', () {
+    test('WeeklySchedule keeps active schedule for today while next prayer points to tomorrow after Isha', () {
       final todayDate = DateTime(2026, 11, 25, 20, 30); // 20:30 (past 18:02 Isha)
-      final tomorrowDate = DateTime(2026, 11, 26);
 
       final todayItems = [
         PrayerItem(type: PrayerType.fajr, time: '06:03', dateTime: DateTime(2026, 11, 25, 6, 3)),
@@ -267,12 +266,16 @@ void main() {
         days: [todaySched, tomorrowSched],
       );
 
-      // At 20:30 (past Isha), effectiveSchedule MUST return tomorrow's schedule
+      // At 20:30 (past Isha), effectiveSchedule keeps today's schedule until midnight
       final eff = weekly.effectiveSchedule(todayDate);
-      expect(eff.gregorianDate, '26.11.2026');
-      expect(eff.items.first.time, '06:05'); // Tomorrow's Diyanet Fajr is 06:05!
+      expect(eff.gregorianDate, '25.11.2026');
 
-      // At 12:00 (midday), effectiveSchedule MUST return today's schedule
+      // But nextPrayer countdown transitions to tomorrow's Fajr
+      final next = eff.nextPrayer(todayDate);
+      expect(next?.isTomorrowFajr, true);
+      expect(next?.item.time, '06:03');
+
+      // At 12:00 (midday), effectiveSchedule is also today's schedule
       final midday = weekly.effectiveSchedule(DateTime(2026, 11, 25, 12, 0));
       expect(midday.gregorianDate, '25.11.2026');
       expect(midday.items.first.time, '06:03');

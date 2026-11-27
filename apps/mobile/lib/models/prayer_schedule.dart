@@ -60,6 +60,7 @@ class PrayerSchedule {
   final String hijriDate;
   final String gregorianDate;
   final List<PrayerItem> items;
+  final DateTime? date;
 
   const PrayerSchedule({
     required this.city,
@@ -68,7 +69,19 @@ class PrayerSchedule {
     required this.hijriDate,
     required this.gregorianDate,
     required this.items,
+    this.date,
   });
+
+  DateTime get effectiveDate {
+    if (date != null) return date!;
+    if (items.isNotEmpty) return items.first.dateTime;
+    return DateTime.now();
+  }
+
+  bool isSameDay(DateTime other) {
+    final d = effectiveDate;
+    return d.year == other.year && d.month == other.month && d.day == other.day;
+  }
 
   NextPrayer? nextPrayer([DateTime? currentTime]) {
     final now = currentTime ?? DateTime.now();
@@ -108,6 +121,8 @@ class PrayerSchedule {
         'method': method.id,
         'hijriDate': hijriDate,
         'gregorianDate': gregorianDate,
+        'date': (date ?? (items.isNotEmpty ? items.first.dateTime : null))
+            ?.millisecondsSinceEpoch,
         'items': items.map((i) => i.toJson()).toList(),
       };
 
@@ -118,6 +133,9 @@ class PrayerSchedule {
       method: CalculationMethod.fromId(json['method'] as int?),
       hijriDate: json['hijriDate'] as String,
       gregorianDate: json['gregorianDate'] as String,
+      date: json['date'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['date'] as int)
+          : null,
       items: (json['items'] as List<dynamic>)
           .map((i) => PrayerItem.fromJson(i as Map<String, dynamic>))
           .toList(),

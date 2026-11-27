@@ -7,6 +7,221 @@ import '../ui/theme.dart';
 class NotificationCardRenderer {
   static const double _cardWidth = 1040;
 
+  // ─── EXPANDED HERO CARD (e-Diyanet inspired with Minar philosophy) ─────────
+  static const double _expandedHeroHeight = 560;
+
+  static Future<Uint8List?> renderExpandedHeroCard({
+    required PrayerSchedule schedule,
+    required NextPrayer? nextPrayer,
+    required bool useTurkish,
+  }) async {
+    try {
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(
+        recorder,
+        const Rect.fromLTWH(0, 0, _cardWidth, _expandedHeroHeight),
+      );
+
+      _drawCardBackground(canvas, _cardWidth, _expandedHeroHeight);
+
+      final nextName =
+          nextPrayer?.item.type.displayName(useTurkish: useTurkish) ?? '';
+      final nextTime = nextPrayer?.item.time ?? '';
+      final remaining = nextPrayer?.formattedRemaining ?? '';
+
+      // 1. Header Bar: Location (Left) + Hijri Date (Right)
+      _drawText(
+        canvas,
+        text: '${schedule.city}, ${schedule.country}',
+        offset: const Offset(28, 22),
+        style: TextStyle(
+          color: MinarTheme.goldWarm,
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+          letterSpacing: -0.3,
+        ),
+      );
+
+      final hijriText = schedule.hijriDate.isNotEmpty
+          ? schedule.hijriDate
+          : schedule.gregorianDate;
+      final hp = TextPainter(
+        text: TextSpan(
+          text: hijriText,
+          style: const TextStyle(
+            color: MinarTheme.textSecondary,
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      hp.paint(canvas, Offset(_cardWidth - 28 - hp.width, 24));
+
+      // Thin divider
+      canvas.drawLine(
+        const Offset(24, 60),
+        const Offset(_cardWidth - 24, 60),
+        Paint()
+          ..color = const Color(0x1AFFFFFF)
+          ..strokeWidth = 1.0,
+      );
+
+      // 2. Center Hero Card: Next Prayer & Countdown
+      final heroLabel = useTurkish
+          ? '${nextName.toUpperCase()} VAKTİNE KALAN'
+          : 'NEXT: ${nextName.toUpperCase()}';
+
+      _drawCenteredText(
+        canvas,
+        text: heroLabel,
+        centerX: _cardWidth / 2,
+        topY: 76,
+        style: TextStyle(
+          color: MinarTheme.goldLight,
+          fontSize: 24,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.5,
+        ),
+      );
+
+      // Large Countdown Timer
+      final timerText = remaining.isNotEmpty ? remaining : nextTime;
+      _drawCenteredText(
+        canvas,
+        text: timerText,
+        centerX: _cardWidth / 2,
+        topY: 110,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 88,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -2.0,
+          fontFeatures: [FontFeature.tabularFigures()],
+        ),
+      );
+
+      // Date subtitle
+      _drawCenteredText(
+        canvas,
+        text: schedule.gregorianDate,
+        centerX: _cardWidth / 2,
+        topY: 218,
+        style: const TextStyle(
+          color: MinarTheme.textSecondary,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+
+      // 3. Bottom 1x6 Timetable Row
+      const double bottomY = 268;
+      const double pad = 16.0;
+      const double gap = 10.0;
+      const double colW = (_cardWidth - pad * 2 - gap * 5) / 6; // ~158px
+      const double cellH = 260.0;
+
+      for (int i = 0; i < schedule.items.length && i < 6; i++) {
+        final item = schedule.items[i];
+        final isNext = nextPrayer?.item.type == item.type;
+        final name = item.type.displayName(useTurkish: useTurkish);
+
+        final double x = pad + i * (colW + gap);
+        final cellRect = Rect.fromLTWH(x, bottomY, colW, cellH);
+        final cellRRect =
+            RRect.fromRectAndRadius(cellRect, const Radius.circular(16));
+
+        final centerX = x + colW / 2;
+
+        if (isNext) {
+          canvas.drawRRect(cellRRect, Paint()..color = const Color(0xFF16253D));
+          canvas.drawRRect(
+              cellRRect, Paint()..color = const Color(0x28E8C582));
+          canvas.drawRRect(
+              cellRRect,
+              Paint()
+                ..color = MinarTheme.goldWarm
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 2.5);
+
+          // Top Accent Gold Bar
+          canvas.drawRRect(
+              RRect.fromRectAndRadius(
+                  Rect.fromLTWH(centerX - 24, bottomY + 10, 48, 4),
+                  const Radius.circular(2)),
+              Paint()..color = MinarTheme.goldWarm);
+
+          _drawCenteredText(
+            canvas,
+            text: name.toUpperCase(),
+            centerX: centerX,
+            topY: bottomY + 36,
+            style: TextStyle(
+              color: MinarTheme.goldLight,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+            ),
+          );
+
+          _drawCenteredText(
+            canvas,
+            text: item.time,
+            centerX: centerX,
+            topY: bottomY + 120,
+            style: TextStyle(
+              color: MinarTheme.goldLight,
+              fontSize: 58,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -1.8,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          );
+        } else {
+          canvas.drawRRect(
+              cellRRect, Paint()..color = const Color(0xFF0C1526));
+          canvas.drawRRect(
+              cellRRect,
+              Paint()
+                ..color = const Color(0x14FFFFFF)
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1.0);
+
+          _drawCenteredText(
+            canvas,
+            text: name.toUpperCase(),
+            centerX: centerX,
+            topY: bottomY + 38,
+            style: const TextStyle(
+              color: MinarTheme.textSecondary,
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
+          );
+
+          _drawCenteredText(
+            canvas,
+            text: item.time,
+            centerX: centerX,
+            topY: bottomY + 122,
+            style: const TextStyle(
+              color: MinarTheme.textPrimary,
+              fontSize: 54,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -1.6,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          );
+        }
+      }
+
+      return _finalize(recorder, _cardWidth, _expandedHeroHeight);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ─── TABLE CARD (2x3 Panoramic Timetable) ──────────────────────────────────
   static const double _tableCardHeight = 480;
 

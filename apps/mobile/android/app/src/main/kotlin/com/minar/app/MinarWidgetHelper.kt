@@ -244,8 +244,7 @@ object MinarWidgetHelper {
                 val isTomorrow = json.optBoolean("isTomorrowFajr", false)
                 val prayers = json.optJSONArray("prayers") ?: JSONArray()
 
-                val prefix = if (isTomorrow) "Tomorrow • " else "Minar • "
-                views.setTextViewText(R.id.widget_tt_title, "$prefix$city")
+                views.setTextViewText(R.id.widget_tt_title, "Minar • $city")
                 views.setTextColor(R.id.widget_tt_title, style.accent.accentColor)
                 views.setTextViewTextSize(R.id.widget_tt_title, TypedValue.COMPLEX_UNIT_SP, 11.5f)
 
@@ -271,9 +270,9 @@ object MinarWidgetHelper {
                 )
 
                 val (nameSize, timeSize) = when (textSizeMode) {
-                    "xlarge" -> Pair(9f, 13.5f)
-                    "large" -> Pair(8.5f, 13f)
-                    else -> Pair(8f, 12.5f)
+                    "xlarge" -> Pair(9.5f, 13.5f)
+                    "large" -> Pair(9f, 13f)
+                    else -> Pair(8.5f, 12.5f)
                 }
 
                 for (i in 0 until minOf(prayers.length(), 6)) {
@@ -297,6 +296,24 @@ object MinarWidgetHelper {
                         views.setTextColor(nameIds[i], style.labelColor)
                         views.setTextColor(timeIds[i], style.normalTextColor)
                     }
+                }
+
+                // Bottom Pill: Next Prayer countdown
+                val nextName = json.optString("nextName", "")
+                val nextRemaining = json.optString("nextRemaining", "")
+                val useTurkish = json.optBoolean("useTurkish", false)
+
+                if (nextName.isNotEmpty()) {
+                    val remText = if (useTurkish) {
+                        "$nextName vaktine kalan: $nextRemaining"
+                    } else {
+                        "Next: $nextName in $nextRemaining"
+                    }
+                    views.setTextViewText(R.id.widget_tt_bottom_text, remText)
+                    views.setTextColor(R.id.widget_tt_bottom_text, style.accent.accentColor)
+                    views.setViewVisibility(R.id.widget_tt_bottom_pill, View.VISIBLE)
+                } else {
+                    views.setViewVisibility(R.id.widget_tt_bottom_pill, View.GONE)
                 }
             } catch (_: Exception) {}
         }

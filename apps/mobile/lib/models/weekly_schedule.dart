@@ -14,25 +14,31 @@ class WeeklySchedule {
     required this.days,
   });
 
-  PrayerSchedule get today =>
-      days.isNotEmpty ? days.first : _fallbackSchedule();
+  PrayerSchedule get today {
+    final now = DateTime.now();
+    for (final day in days) {
+      if (day.isSameDay(now)) return day;
+    }
+    return days.isNotEmpty ? days.first : _fallbackSchedule();
+  }
 
-  PrayerSchedule? get tomorrow => days.length > 1 ? days[1] : null;
+  PrayerSchedule? get tomorrow {
+    final tom = DateTime.now().add(const Duration(days: 1));
+    for (final day in days) {
+      if (day.isSameDay(tom)) return day;
+    }
+    return days.length > 1 ? days[1] : null;
+  }
 
-  /// Returns tomorrow's schedule when the current time is past today's Isha,
-  /// otherwise returns today's schedule.
+  /// The active timetable and dates remain today's until midnight (00:00).
+  /// Looking forward past Isha is handled by nextPrayer countdown.
   PrayerSchedule effectiveSchedule([DateTime? currentTime]) {
     if (days.isEmpty) return _fallbackSchedule();
     final now = currentTime ?? DateTime.now();
-    final todaySchedule = days.first;
-    final next = todaySchedule.nextPrayer(now);
-
-    // If next prayer is marked as tomorrow's Fajr (i.e. past Isha today)
-    // and we have tomorrow's full schedule, switch to tomorrow!
-    if (next != null && next.isTomorrowFajr && days.length > 1) {
-      return days[1];
+    for (final day in days) {
+      if (day.isSameDay(now)) return day;
     }
-    return todaySchedule;
+    return today;
   }
 
   PrayerSchedule getDay(int index) {

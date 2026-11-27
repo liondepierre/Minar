@@ -129,7 +129,9 @@ class DiyanetService {
     }
   }
 
-  /// Fetches 8 days of schedules (Today + 7 future days) in a single 2KB request.
+  /// Fetches rolling schedules covering today + 7 future days.
+  /// Combines monthly and weekly endpoints to guarantee local today is always
+  /// included regardless of timezone differences with Turkey (UTC+3).
   Future<WeeklySchedule?> fetchWeeklyTimings({
     required String city,
     required String country,
@@ -147,20 +149,53 @@ class DiyanetService {
 
       _districtCache[normCity] = targetId;
 
-      // Note: /weekly returns 8 full days in one lightweight payload!
-      final uri = Uri.parse('$_baseUrl/prayer-times/$targetId/weekly');
-      final res = await http.get(uri).timeout(const Duration(seconds: 8));
+      final uriMonthly = Uri.parse('$_baseUrl/prayer-times/$targetId/monthly');
+      final uriWeekly = Uri.parse('$_baseUrl/prayer-times/$targetId/weekly');
 
-      if (res.statusCode != 200) return null;
+      final responses = await Future.wait([
+        http.get(uriMonthly).timeout(const Duration(seconds: 8)),
+        http.get(uriWeekly).timeout(const Duration(seconds: 8)),
+      ]).catchError((_) => <http.Response>[]);
 
-      final json = jsonDecode(res.body) as Map<String, dynamic>;
-      final data = json['data'] as List<dynamic>?;
-      if (data == null || data.isEmpty) return null;
+      final Map<String, Map<String, dynamic>> rawDaysByDate = {};
+
+      for (final res in responses) {
+        if (res.statusCode == 200) {
+          try {
+            final json = jsonDecode(res.body) as Map<String, dynamic>;
+            final data = json['data'] as List<dynamic>?;
+            if (data != null) {
+              for (final raw in data) {
+                final day = raw as Map<String, dynamic>;
+                final rawDate = (day['date'] as String? ?? '').split('T').first;
+                if (rawDate.isNotEmpty && !rawDaysByDate.containsKey(rawDate)) {
+                  rawDaysByDate[rawDate] = day;
+                }
+              }
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (rawDaysByDate.isEmpty) return null;
+
+      final now = DateTime.now();
+      final todayStr =
+          '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+      final sortedDates = rawDaysByDate.keys.toList()..sort();
+      final futureDates =
+          sortedDates.where((d) => d.compareTo(todayStr) >= 0).take(8).toList();
+
+      final targetDates =
+          futureDates.isNotEmpty ? futureDates : sortedDates.take(8).toList();
 
       final List<PrayerSchedule> days = [];
-      for (int i = 0; i < data.length; i++) {
-        final day = data[i] as Map<String, dynamic>;
-        final parsed = _parseDay(day, city: city, country: country, dayIndex: i);
+      for (int i = 0; i < targetDates.length; i++) {
+        final dStr = targetDates[i];
+        final dayMap = rawDaysByDate[dStr]!;
+        final parsed =
+            _parseDay(dayMap, city: city, country: country, dayIndex: i);
         if (parsed != null) {
           days.add(parsed);
         }
@@ -219,11 +254,19 @@ class DiyanetService {
       final rawDateStr = day['date'] as String?;
 
       DateTime targetDate;
-      if (rawDateStr != null) {
-        final parsed = DateTime.tryParse(rawDateStr);
-        if (parsed != null) {
-          final local = parsed.toLocal();
-          targetDate = DateTime(local.year, local.month, local.day);
+      if (rawDateStr != null && rawDateStr.isNotEmpty) {
+        final datePart = rawDateStr.split('T').first;
+        final parts = datePart.split('-');
+        if (parts.length >= 3) {
+          final y = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          final d = int.tryParse(parts[2]);
+          if (y != null && m != null && d != null) {
+            targetDate = DateTime(y, m, d);
+          } else {
+            final base = DateTime.now().add(Duration(days: dayIndex));
+            targetDate = DateTime(base.year, base.month, base.day);
+          }
         } else {
           final base = DateTime.now().add(Duration(days: dayIndex));
           targetDate = DateTime(base.year, base.month, base.day);
@@ -266,16 +309,16 @@ class DiyanetService {
         ),
       ];
 
-      final hijriStr = hijri != null
-          ? '${hijri['full_date']} AH'
-          : '';
+      final hijriStr = hijri != null ? '${hijri['full_date']} AH' : '';
 
       return PrayerSchedule(
         city: city,
         country: country,
         method: CalculationMethod.diyanet,
         hijriDate: hijriStr,
-        gregorianDate: '${targetDate.day}.${targetDate.month}.${targetDate.year}',
+        gregorianDate:
+            '${targetDate.day.toString().padLeft(2, '0')}.${targetDate.month.toString().padLeft(2, '0')}.${targetDate.year}',
+        date: targetDate,
         items: items,
       );
     } catch (_) {

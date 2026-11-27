@@ -89,40 +89,46 @@ class NotificationService {
       if (!_isInitialized) await init();
       if (!_isInitialized) return;
 
-      // All three styles render a styled PNG and push it via the native channel
+      // All three styles render styled PNGs and push via the native channel
       // so no Minar icon appears in the status bar or notification header.
       if (Platform.isAndroid) {
-        Uint8List? pngBytes;
+        Uint8List? compactBytes;
+        Uint8List? expandedBytes;
 
-        switch (style) {
-          case 'compact':
-            pngBytes = await NotificationCardRenderer.renderCompactCard(
-              schedule: schedule,
-              nextPrayer: nextPrayer,
-              useTurkish: useTurkish,
-            );
-            break;
-          case 'minimal':
-            pngBytes = await NotificationCardRenderer.renderMinimalCard(
-              schedule: schedule,
-              nextPrayer: nextPrayer,
-              useTurkish: useTurkish,
-            );
-            break;
-          case 'table':
-          default:
-            pngBytes = await NotificationCardRenderer.renderTableCard(
-              schedule: schedule,
-              nextPrayer: nextPrayer,
-              useTurkish: useTurkish,
-            );
-            break;
+        if (style == 'minimal') {
+          compactBytes = await NotificationCardRenderer.renderMinimalCard(
+            schedule: schedule,
+            nextPrayer: nextPrayer,
+            useTurkish: useTurkish,
+          );
+        } else {
+          compactBytes = await NotificationCardRenderer.renderCompactCard(
+            schedule: schedule,
+            nextPrayer: nextPrayer,
+            useTurkish: useTurkish,
+          );
         }
 
-        if (pngBytes != null) {
+        // Expanded view (shows rich hero card with countdown like e-Diyanet when dropdown chevron is expanded)
+        expandedBytes = await NotificationCardRenderer.renderExpandedHeroCard(
+          schedule: schedule,
+          nextPrayer: nextPrayer,
+          useTurkish: useTurkish,
+        );
+
+        expandedBytes ??= await NotificationCardRenderer.renderTableCard(
+          schedule: schedule,
+          nextPrayer: nextPrayer,
+          useTurkish: useTurkish,
+        );
+
+        if (compactBytes != null || expandedBytes != null) {
           try {
-            await _nativeChannel
-                .invokeMethod('showPinnedTable', {'bytes': pngBytes});
+            await _nativeChannel.invokeMethod('showPinnedTable', {
+              'bytes': expandedBytes ?? compactBytes,
+              'compactBytes': compactBytes ?? expandedBytes,
+              'expandedBytes': expandedBytes ?? compactBytes,
+            });
             return;
           } catch (_) {}
         }

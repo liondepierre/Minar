@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -6,8 +7,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.6';
-const int kAppBuild = 7;
+const String kAppVersion = '1.1.7';
+const int kAppBuild = 8;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -1777,98 +1778,253 @@ class _SettingsSheetState extends State<SettingsSheet> {
 
         showDialog(
           context: context,
-          builder: (ctx) => MediaQuery(
-            data: MediaQuery.of(ctx).copyWith(
-              textScaler: TextScaler.linear(widget.controller.zoomScale),
-            ),
-            child: AlertDialog(
-              backgroundColor: MinarTheme.surfaceSolid,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: const BorderSide(color: MinarTheme.borderFaint),
-              ),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: MinarTheme.surfaceSubtle,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isNewer
-                          ? Icons.system_update_rounded
-                          : Icons.check_circle_outline_rounded,
-                      color: isNewer ? MinarTheme.goldWarm : Colors.greenAccent,
-                      size: 22,
-                    ),
+          builder: (ctx) {
+            bool isDownloading = false;
+            double downloadProgress = 0.0;
+            bool isDownloaded = false;
+            String? downloadedPath;
+            String? downloadError;
+
+            return StatefulBuilder(
+              builder: (ctx, setDialogState) {
+                Future<void> startDownloadAndInstall() async {
+                  final targetApkUrl = apkUrl;
+                  if (targetApkUrl == null) return;
+                  setDialogState(() {
+                    isDownloading = true;
+                    downloadProgress = 0.0;
+                    downloadError = null;
+                  });
+
+                  try {
+                    const updater = MethodChannel('com.minar.app/updater');
+                    final cacheDir =
+                        await updater.invokeMethod<String>('getCacheDir');
+                    final targetPath =
+                        '${cacheDir ?? '/data/user/0/com.minar.app/cache'}/minar-update.apk';
+                    final targetFile = File(targetPath);
+                    if (await targetFile.exists()) {
+                      await targetFile.delete();
+                    }
+
+                    final client = http.Client();
+                    final req = http.Request('GET', Uri.parse(targetApkUrl));
+                    final streamedRes = await client.send(req);
+                    final totalBytes = streamedRes.contentLength ?? 0;
+                    int receivedBytes = 0;
+
+                    final sink = targetFile.openWrite();
+                    await streamedRes.stream.listen((chunk) {
+                      sink.add(chunk);
+                      receivedBytes += chunk.length;
+                      if (totalBytes > 0) {
+                        final p = (receivedBytes / totalBytes).clamp(0.0, 1.0);
+                        setDialogState(() {
+                          downloadProgress = p;
+                        });
+                      }
+                    }).asFuture();
+                    await sink.flush();
+                    await sink.close();
+                    client.close();
+
+                    downloadedPath = targetPath;
+                    setDialogState(() {
+                      isDownloading = false;
+                      isDownloaded = true;
+                      downloadProgress = 1.0;
+                    });
+
+                    // Trigger system installer immediately
+                    await updater.invokeMethod('installApk', {
+                      'filePath': targetPath,
+                    });
+                  } catch (e) {
+                    setDialogState(() {
+                      isDownloading = false;
+                      downloadError = 'In-app download error. You can still open GitHub.';
+                    });
+                  }
+                }
+
+                Future<void> triggerInstallOnly() async {
+                  if (downloadedPath == null) return;
+                  const updater = MethodChannel('com.minar.app/updater');
+                  await updater.invokeMethod('installApk', {
+                    'filePath': downloadedPath,
+                  });
+                }
+
+                return MediaQuery(
+                  data: MediaQuery.of(ctx).copyWith(
+                    textScaler: TextScaler.linear(widget.controller.zoomScale),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    isNewer ? widget.controller.strings.updateAvailable : widget.controller.strings.upToDate,
-                    style: const TextStyle(
-                      color: MinarTheme.textPrimary,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  child: AlertDialog(
+                    backgroundColor: MinarTheme.surfaceSolid,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: MinarTheme.borderFaint),
                     ),
-                  ),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isNewer
-                        ? 'Minar v$latestTag is available (you have v$kAppVersion).'
-                        : 'Minar v$kAppVersion is currently the latest release.',
-                    style: const TextStyle(
-                      color: MinarTheme.textPrimary,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
+                    title: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: MinarTheme.surfaceSubtle,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            isNewer
+                                ? Icons.system_update_rounded
+                                : Icons.check_circle_outline_rounded,
+                            color: isNewer
+                                ? MinarTheme.goldWarm
+                                : Colors.greenAccent,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          isNewer
+                              ? widget.controller.strings.updateAvailable
+                              : widget.controller.strings.upToDate,
+                          style: const TextStyle(
+                            color: MinarTheme.textPrimary,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    isNewer && body.isNotEmpty
-                        ? (body.length > 250 ? '${body.substring(0, 250)}...' : body)
-                        : """• Local Diyanet & AlAdhan timing engine active
-• 4 native home screen widgets synchronized
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isNewer
+                              ? 'Minar v$latestTag is available (you have v$kAppVersion).'
+                              : 'Minar v$kAppVersion is currently the latest release.',
+                          style: const TextStyle(
+                            color: MinarTheme.textPrimary,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (isDownloading) ...[
+                          const SizedBox(height: 6),
+                          LinearProgressIndicator(
+                            value: downloadProgress > 0 ? downloadProgress : null,
+                            backgroundColor: MinarTheme.surfaceSubtle,
+                            valueColor:
+                                AlwaysStoppedAnimation(MinarTheme.goldWarm),
+                            borderRadius: BorderRadius.circular(4),
+                            minHeight: 6,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${(downloadProgress * 100).toInt()}% • ${widget.controller.strings.downloadingUpdate}',
+                            style: TextStyle(
+                              color: MinarTheme.goldLight,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                        ] else if (isDownloaded) ...[
+                          const SizedBox(height: 6),
+                          const Row(
+                            children: [
+                              Icon(Icons.check_circle_rounded,
+                                  color: Colors.greenAccent, size: 18),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Download complete! Ready to update.',
+                                  style: TextStyle(
+                                    color: Colors.greenAccent,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                        ] else ...[
+                          Text(
+                            isNewer && body.isNotEmpty
+                                ? (body.length > 250
+                                    ? '${body.substring(0, 250)}...'
+                                    : body)
+                                : """• Local timing engine active
+• Native home screen widgets synchronized
 • Battery-efficient offline timetable loaded
 • GitHub: liondepierre/Minar""",
-                    style: const TextStyle(
-                      color: MinarTheme.textSecondary,
-                      fontSize: 12,
-                      height: 1.45,
+                            style: const TextStyle(
+                              color: MinarTheme.textSecondary,
+                              fontSize: 12,
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
+                        if (downloadError != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            downloadError!,
+                            style: const TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
+                    actions: [
+                      if (isNewer && apkUrl != null)
+                        if (isDownloaded)
+                          TextButton(
+                            onPressed: triggerInstallOnly,
+                            style: TextButton.styleFrom(
+                                foregroundColor: MinarTheme.goldWarm),
+                            child: Text(widget.controller.strings.installUpdate,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          )
+                        else if (!isDownloading)
+                          TextButton(
+                            onPressed: startDownloadAndInstall,
+                            style: TextButton.styleFrom(
+                                foregroundColor: MinarTheme.goldWarm),
+                            child: Text(widget.controller.strings.downloadApk,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          if (isNewer && !isDownloaded && !isDownloading) {
+                            _openUrl(releaseUrl);
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: isNewer
+                              ? MinarTheme.textSecondary
+                              : MinarTheme.goldWarm,
+                        ),
+                        child: Text(
+                          isNewer
+                              ? widget.controller.strings.later
+                              : widget.controller.strings.ok,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              actions: [
-                if (isNewer && apkUrl != null)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _openUrl(apkUrl!);
-                    },
-                    style: TextButton.styleFrom(foregroundColor: MinarTheme.goldWarm),
-                    child: Text(widget.controller.strings.downloadApk, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    if (isNewer) {
-                      _openUrl(releaseUrl);
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: isNewer ? MinarTheme.textSecondary : MinarTheme.goldWarm,
-                  ),
-                  child: Text(isNewer ? widget.controller.strings.later : widget.controller.strings.ok, style: const TextStyle(fontWeight: FontWeight.w600)),
-                ),
-              ],
-            ),
-          ),
+                );
+              },
+            );
+          },
         );
       } else {
         _showUpdateErrorDialog(context, 'GitHub API returned status ${res.statusCode}');

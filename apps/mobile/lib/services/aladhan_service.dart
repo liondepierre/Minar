@@ -85,7 +85,9 @@ class AlAdhanService {
       country: country,
       method: method,
       hijriDate: hijriFormatted,
-      gregorianDate: gregorian,
+      gregorianDate:
+          '${targetDate.day.toString().padLeft(2, '0')}.${targetDate.month.toString().padLeft(2, '0')}.${targetDate.year}',
+      date: targetDate,
       items: _parsePrayerItems(timings, targetDate),
     );
   }
@@ -119,8 +121,6 @@ class AlAdhanService {
 
       for (int i = 0; i < data.length; i++) {
         final dayData = data[i] as Map<String, dynamic>;
-        final dayDate = now.add(Duration(days: days.length));
-        // Find days starting from today
         final dateObj = dayData['date'] as Map<String, dynamic>?;
         final gregorianObj = dateObj?['gregorian'] as Map<String, dynamic>?;
         final dNum = int.tryParse(gregorianObj?['day']?.toString() ?? '');
@@ -135,6 +135,49 @@ class AlAdhanService {
             targetDate: target,
           ));
         }
+      }
+
+      // If near end of month, fetch next month's start so we always have a full week
+      if (days.length < 8) {
+        try {
+          final nextMonthDate = DateTime(now.year, now.month + 1, 1);
+          final nextUri = Uri.parse(
+                  '$_baseUrl/calendar/${nextMonthDate.year}/${nextMonthDate.month}')
+              .replace(
+            queryParameters: {
+              'latitude': latitude.toStringAsFixed(5),
+              'longitude': longitude.toStringAsFixed(5),
+              'method': method.id.toString(),
+            },
+          );
+          final nextRes =
+              await http.get(nextUri).timeout(const Duration(seconds: 5));
+          if (nextRes.statusCode == 200) {
+            final nextJson = jsonDecode(nextRes.body) as Map<String, dynamic>;
+            final nextData = nextJson['data'] as List<dynamic>?;
+            if (nextData != null) {
+              for (int i = 0; i < nextData.length && days.length < 8; i++) {
+                final dayData = nextData[i] as Map<String, dynamic>;
+                final dateObj = dayData['date'] as Map<String, dynamic>?;
+                final gregorianObj =
+                    dateObj?['gregorian'] as Map<String, dynamic>?;
+                final dNum =
+                    int.tryParse(gregorianObj?['day']?.toString() ?? '');
+                if (dNum != null) {
+                  final target =
+                      DateTime(nextMonthDate.year, nextMonthDate.month, dNum);
+                  days.add(_parseAlAdhanResponse(
+                    dayData,
+                    city: city,
+                    country: country,
+                    method: method,
+                    targetDate: target,
+                  ));
+                }
+              }
+            }
+          }
+        } catch (_) {}
       }
 
       if (days.isEmpty) return null;
@@ -191,6 +234,49 @@ class AlAdhanService {
             targetDate: target,
           ));
         }
+      }
+
+      // If near end of month, fetch next month's start so we always have a full week
+      if (days.length < 8) {
+        try {
+          final nextMonthDate = DateTime(now.year, now.month + 1, 1);
+          final nextUri = Uri.parse(
+                  '$_baseUrl/calendarByCity/${nextMonthDate.year}/${nextMonthDate.month}')
+              .replace(
+            queryParameters: {
+              'city': city.trim(),
+              'country': country.trim(),
+              'method': method.id.toString(),
+            },
+          );
+          final nextRes =
+              await http.get(nextUri).timeout(const Duration(seconds: 5));
+          if (nextRes.statusCode == 200) {
+            final nextJson = jsonDecode(nextRes.body) as Map<String, dynamic>;
+            final nextData = nextJson['data'] as List<dynamic>?;
+            if (nextData != null) {
+              for (int i = 0; i < nextData.length && days.length < 8; i++) {
+                final dayData = nextData[i] as Map<String, dynamic>;
+                final dateObj = dayData['date'] as Map<String, dynamic>?;
+                final gregorianObj =
+                    dateObj?['gregorian'] as Map<String, dynamic>?;
+                final dNum =
+                    int.tryParse(gregorianObj?['day']?.toString() ?? '');
+                if (dNum != null) {
+                  final target =
+                      DateTime(nextMonthDate.year, nextMonthDate.month, dNum);
+                  days.add(_parseAlAdhanResponse(
+                    dayData,
+                    city: city,
+                    country: country,
+                    method: method,
+                    targetDate: target,
+                  ));
+                }
+              }
+            }
+          }
+        } catch (_) {}
       }
 
       if (days.isEmpty) return null;

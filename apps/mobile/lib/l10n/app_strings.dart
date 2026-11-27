@@ -394,11 +394,27 @@ class AppStrings {
       };
 
   String get downloadApk => switch (code) {
-        'tr' => 'APK İndir',
-        'da' => 'Hent APK',
-        'de' => 'APK herunterladen',
-        'ar' => 'تحميل APK',
-        _ => 'Download APK',
+        'tr' => 'Güncellemeyi İndir',
+        'da' => 'Hent opdatering',
+        'de' => 'Update herunterladen',
+        'ar' => 'تحميل التحديث',
+        _ => 'Download Update',
+      };
+
+  String get downloadingUpdate => switch (code) {
+        'tr' => 'İndiriliyor...',
+        'da' => 'Henter opdatering...',
+        'de' => 'Update wird heruntergeladen...',
+        'ar' => 'جاري تحميل التحديث...',
+        _ => 'Downloading...',
+      };
+
+  String get installUpdate => switch (code) {
+        'tr' => 'Şimdi Güncelle',
+        'da' => 'Opdater nu',
+        'de' => 'Jetzt aktualisieren',
+        'ar' => 'تثبيت التحديث',
+        _ => 'Update Now',
       };
 
   String get later => switch (code) {
