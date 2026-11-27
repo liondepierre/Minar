@@ -37,7 +37,11 @@ class PrayerController extends ChangeNotifier {
     if (notificationsEnabled || pinnedNotificationEnabled) {
       _notifications.requestPermissions();
     }
-    fetchSchedule();
+    if (autoLocation) {
+      autoDetectLocation();
+    } else {
+      fetchSchedule();
+    }
   }
 
   static PrayerSchedule defaultSchedule(String city, String country) {

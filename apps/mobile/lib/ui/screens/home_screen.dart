@@ -147,8 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: MinarTheme.textSecondary,
                                           size: 20,
                                         ),
-                                        onPressed: () =>
-                                            c.fetchSchedule(force: true),
+                                        onPressed: () => c.autoLocation
+                                            ? c.autoDetectLocation()
+                                            : c.fetchSchedule(force: true),
                                       ),
                                     IconButton(
                                       icon: const Icon(

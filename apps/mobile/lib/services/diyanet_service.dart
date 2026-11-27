@@ -16,8 +16,8 @@ class DiyanetDistrict {
 class DiyanetService {
   static const String _baseUrl = 'https://ezanvakti.imsakiyem.com/api';
 
-  /// Cached district id from the last successful fetchTimings call.
-  String? _lastDistrictId;
+  /// District IDs cached by normalized city name to avoid cross-city ID collisions.
+  final Map<String, String> _districtCache = {};
 
   DateTime _parseTime(String timeStr, DateTime targetDate) {
     final parts = timeStr.split(':');
@@ -37,33 +37,90 @@ class DiyanetService {
       final cleanQuery = GeocodingService.sanitize(cityQuery);
       if (!GeocodingService.isValidPlaceName(cleanQuery)) return null;
 
-      final uri = Uri.parse('$_baseUrl/locations/search/districts')
-          .replace(queryParameters: {'q': cleanQuery.toLowerCase()});
-
-      final res = await http.get(uri).timeout(const Duration(seconds: 8));
-      if (res.statusCode != 200) return null;
-
-      final json = jsonDecode(res.body) as Map<String, dynamic>;
-      final data = json['data'] as List<dynamic>?;
-      if (data == null || data.isEmpty) return null;
-
       final normQuery = GeocodingService.normalize(cleanQuery);
+      if (_districtCache.containsKey(normQuery)) {
+        final id = _districtCache[normQuery]!;
+        return DiyanetDistrict(id: id, name: cleanQuery.toUpperCase());
+      }
 
-      for (final raw in data) {
-        final item = raw as Map<String, dynamic>;
-        final rawName = (item['name_en'] ?? item['name']) as String?;
-        if (rawName == null) continue;
+      // Extract search terms: remove common administrative noise words
+      final stopWords = {
+        'kommune',
+        'municipality',
+        'county',
+        'district',
+        'city',
+        'town',
+        'province',
+        'region',
+        'shahr',
+        'sehir',
+        'ili',
+        'ilcesi'
+      };
+      final tokens = normQuery
+          .split(RegExp(r'[\s\-_,]+'))
+          .where((t) => t.isNotEmpty && !stopWords.contains(t))
+          .toList();
 
-        final strippedName = rawName.split('(').first.trim();
-        final normName = GeocodingService.normalize(strippedName);
-        final normFull = GeocodingService.normalize(rawName);
+      final searchWords = tokens.isNotEmpty ? tokens : [normQuery];
 
-        // Require exact normalized district match
-        if (normName == normQuery || normFull == normQuery) {
-          return DiyanetDistrict(
-            id: item['_id'] as String,
-            name: (item['name'] as String).toUpperCase(),
-          );
+      // Try searching for the most specific word first (e.g. "ikast"), then full query
+      final queriesToTry = [
+        searchWords.first,
+        if (searchWords.length > 1) normQuery,
+      ];
+
+      for (final q in queriesToTry) {
+        final uri = Uri.parse('$_baseUrl/locations/search/districts')
+            .replace(queryParameters: {'q': q.toLowerCase()});
+
+        final res = await http.get(uri).timeout(const Duration(seconds: 8));
+        if (res.statusCode != 200) continue;
+
+        final json = jsonDecode(res.body) as Map<String, dynamic>;
+        final data = json['data'] as List<dynamic>?;
+        if (data == null || data.isEmpty) continue;
+
+        // 1. Exact match pass
+        for (final raw in data) {
+          final item = raw as Map<String, dynamic>;
+          final rawName = (item['name_en'] ?? item['name']) as String?;
+          if (rawName == null) continue;
+
+          final strippedName = rawName.split('(').first.trim();
+          final normName = GeocodingService.normalize(strippedName);
+          final normFull = GeocodingService.normalize(rawName);
+
+          if (normName == normQuery || normFull == normQuery || normName == q) {
+            final id = item['_id'] as String;
+            _districtCache[normQuery] = id;
+            return DiyanetDistrict(
+              id: id,
+              name: (item['name'] as String).toUpperCase(),
+            );
+          }
+        }
+
+        // 2. Token match pass (e.g. query has "ikast", item is "IKAST")
+        for (final raw in data) {
+          final item = raw as Map<String, dynamic>;
+          final rawName = (item['name_en'] ?? item['name']) as String?;
+          if (rawName == null) continue;
+
+          final strippedName = rawName.split('(').first.trim();
+          final normName = GeocodingService.normalize(strippedName);
+
+          if (searchWords.contains(normName) ||
+              normQuery.contains(normName) ||
+              normName.contains(normQuery)) {
+            final id = item['_id'] as String;
+            _districtCache[normQuery] = id;
+            return DiyanetDistrict(
+              id: id,
+              name: (item['name'] as String).toUpperCase(),
+            );
+          }
         }
       }
       return null;
@@ -79,7 +136,8 @@ class DiyanetService {
     String? districtId,
   }) async {
     try {
-      String? targetId = districtId ?? _lastDistrictId;
+      final normCity = GeocodingService.normalize(city);
+      String? targetId = districtId ?? _districtCache[normCity];
 
       if (targetId == null || targetId.isEmpty) {
         final district = await searchDistrict(city);
@@ -87,7 +145,7 @@ class DiyanetService {
         targetId = district.id;
       }
 
-      _lastDistrictId = targetId;
+      _districtCache[normCity] = targetId;
 
       // Note: /weekly returns 8 full days in one lightweight payload!
       final uri = Uri.parse('$_baseUrl/prayer-times/$targetId/weekly');

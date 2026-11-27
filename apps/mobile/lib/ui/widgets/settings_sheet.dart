@@ -6,8 +6,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.5';
-const int kAppBuild = 6;
+const String kAppVersion = '1.1.6';
+const int kAppBuild = 7;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
