@@ -9,7 +9,7 @@
 
 1. **No Ads, Ever**: No banners, no interstitial popups, no tracking SDKs.
 2. **Timeless Dignified Aesthetic**: Deep twilight midnight gradient (`#0D1B2A` → `#050B14`), warm champagne gold highlights (`#FFDE99`), and clean typography.
-3. **Diyanet Accuracy**: Uses pre-computed official Diyanet tables directly (`ezanvakti.imsakiyem.com`) to prevent Scandinavian high-latitude angle drift (e.g. Ikast, Denmark). Fallback to AlAdhan for MWL, ISNA, Makkah, and Egypt.
+3. **Diyanet Accuracy**: Uses pre-computed official Diyanet tables directly (`ezanvakti.imsakiyem.com`) to prevent high-latitude angle drift. Fallback to AlAdhan for MWL, ISNA, Makkah, and Egypt.
 4. **Offline First**: Caches schedules locally in `SharedPreferences`. Works completely without internet after sync.
 5. **Battery Respect**: Only ticks a lightweight 1s/30s timer in the foreground. Notifications are scheduled via native alarms, requiring zero background RAM consumption.
 

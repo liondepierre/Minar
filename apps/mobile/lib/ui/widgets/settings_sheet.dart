@@ -6,8 +6,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.0';
-const int kAppBuild = 2;
+const String kAppVersion = '1.1.2';
+const int kAppBuild = 3;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -373,17 +373,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   ),
                 ),
                 Flexible(
-                  child: NotificationListener<ScrollUpdateNotification>(
-                    onNotification: (notification) {
-                      if (notification.metrics.pixels <= 0 &&
-                          notification.scrollDelta != null &&
-                          notification.scrollDelta! < -8) {
-                        _dismissSheet();
-                        return true;
-                      }
-                      return false;
-                    },
-                    child: SingleChildScrollView(
+                  child: SingleChildScrollView(
                       padding: EdgeInsets.only(
                         left: 20,
                         right: 20,
@@ -1330,8 +1320,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
             ),
           ),
         ),
-      ),
-    ],
+      ],
   ),
 ),
 ),
