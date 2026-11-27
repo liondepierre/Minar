@@ -6,8 +6,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.2';
-const int kAppBuild = 3;
+const String kAppVersion = '1.1.3';
+const int kAppBuild = 4;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -99,6 +99,7 @@ class SettingsSheet extends StatefulWidget {
 
 class _SettingsSheetState extends State<SettingsSheet> {
   bool _isDismissing = false;
+  bool _dragStartedAtTop = false;
 
   void _dismissSheet() {
     if (_isDismissing || !mounted) return;
@@ -308,10 +309,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
             textScaler: TextScaler.linear(textScale),
           ),
           child: SafeArea(
-            top: true,
+            top: false,
             bottom: false,
             child: Container(
-              margin: EdgeInsets.only(top: zoom ? 28 : 36),
+              margin: EdgeInsets.only(
+                top: (MediaQuery.of(context).size.height * (zoom ? 0.08 : 0.12)).clamp(64.0, 130.0),
+              ),
               decoration: BoxDecoration(
                 color: MinarTheme.surfaceSolid,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -334,14 +337,14 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Center(
                           child: Container(
-                            width: 48,
+                            width: 52,
                             height: 5,
                             decoration: BoxDecoration(
                               color: MinarTheme.textSecondary.withOpacity(0.4),
@@ -373,7 +376,25 @@ class _SettingsSheetState extends State<SettingsSheet> {
                   ),
                 ),
                 Flexible(
-                  child: SingleChildScrollView(
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification is ScrollStartNotification) {
+                        _dragStartedAtTop = notification.metrics.pixels <= 0 &&
+                            notification.dragDetails != null;
+                      } else if (notification is ScrollUpdateNotification) {
+                        if (_dragStartedAtTop &&
+                            notification.metrics.pixels <= 0 &&
+                            notification.scrollDelta != null &&
+                            notification.scrollDelta! < -12) {
+                          _dismissSheet();
+                          return true;
+                        }
+                      } else if (notification is ScrollEndNotification) {
+                        _dragStartedAtTop = false;
+                      }
+                      return false;
+                    },
+                    child: SingleChildScrollView(
                       padding: EdgeInsets.only(
                         left: 20,
                         right: 20,
@@ -1320,7 +1341,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
             ),
           ),
         ),
-      ],
+      ),
+    ],
   ),
 ),
 ),
