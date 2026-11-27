@@ -6,8 +6,8 @@ import '../../models/calculation_method.dart';
 import '../../state/prayer_controller.dart';
 import '../theme.dart';
 
-const String kAppVersion = '1.1.3';
-const int kAppBuild = 4;
+const String kAppVersion = '1.1.4';
+const int kAppBuild = 5;
 
 const Map<String, List<String>> _popularLocations = {
   'Japan': [
@@ -356,9 +356,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Settings',
-                              style: TextStyle(
+                            Text(
+                              c.strings.settings,
+                              style: const TextStyle(
                                 color: MinarTheme.textPrimary,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -381,11 +381,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       if (notification is ScrollStartNotification) {
                         _dragStartedAtTop = notification.metrics.pixels <= 0 &&
                             notification.dragDetails != null;
+                      } else if (notification is OverscrollNotification) {
+                        if (_dragStartedAtTop && notification.overscroll < 0) {
+                          _dismissSheet();
+                          return true;
+                        }
                       } else if (notification is ScrollUpdateNotification) {
                         if (_dragStartedAtTop &&
                             notification.metrics.pixels <= 0 &&
                             notification.scrollDelta != null &&
-                            notification.scrollDelta! < -12) {
+                            notification.scrollDelta! < -8) {
                           _dismissSheet();
                           return true;
                         }
@@ -405,9 +410,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                 // Location Section
-                const Text(
-                  'LOCATION',
-                  style: TextStyle(
+                Text(
+                  c.strings.location,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -420,8 +425,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 Row(
                   children: [
                     _buildLocationModeOption(
-                      label: 'Device',
-                      caption: 'Battery-saver • No GPS',
+                      label: c.strings.device,
+                      caption: c.strings.deviceCaption,
                       icon: Icons.my_location_rounded,
                       selected: c.autoLocation && c.locationMode == 'device',
                       onTap: () async {
@@ -432,8 +437,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     ),
                     const SizedBox(width: 8),
                     _buildLocationModeOption(
-                      label: 'Network IP',
-                      caption: 'Zero permissions',
+                      label: c.strings.networkIp,
+                      caption: c.strings.zeroPermissions,
                       icon: Icons.wifi_rounded,
                       selected: c.autoLocation && c.locationMode != 'device',
                       onTap: () async {
@@ -444,8 +449,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     ),
                     const SizedBox(width: 8),
                     _buildLocationModeOption(
-                      label: 'Manual City',
-                      caption: 'Pick from list',
+                      label: c.strings.manualCity,
+                      caption: c.strings.pickFromList,
                       icon: Icons.edit_location_alt_rounded,
                       selected: !c.autoLocation,
                       onTap: () async {
@@ -800,19 +805,42 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 const SizedBox(height: 18),
 
                 // Preferences
-                const Text(
-                  'PREFERENCES',
-                  style: TextStyle(
+                Text(
+                  c.strings.preferences,
+                  style: const TextStyle(
                     color: MinarTheme.sectionHeader,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  c.strings.language,
+                  style: const TextStyle(color: MinarTheme.textPrimary, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildLanguageChip('English', 'en', c),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip('Türkçe', 'tr', c),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip('Dansk', 'da', c),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip('Deutsch', 'de', c),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip('العربية', 'ar', c),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Turkish Prayer Names',
-                      style: TextStyle(
+                  title: Text(c.strings.turkishPrayerNames,
+                      style: const TextStyle(
                           color: MinarTheme.textPrimary, fontSize: 14)),
                   subtitle: Text(
                     c.useTurkish
@@ -827,13 +855,13 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 ),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Zoom Enhanced Mode',
-                      style: TextStyle(
+                  title: Text(c.strings.zoomEnhancedMode,
+                      style: const TextStyle(
                           color: MinarTheme.textPrimary, fontSize: 14)),
-                  subtitle: const Text(
-                    'Large text & numbers for enhanced visibility',
+                  subtitle: Text(
+                    c.strings.zoomEnhancedCaption,
                     style:
-                        TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
+                        const TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
                   ),
                   value: c.zoomEnhanced,
                   activeColor: MinarTheme.goldWarm,
@@ -841,13 +869,13 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 ),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Prayer Notifications',
-                      style: TextStyle(
+                  title: Text(c.strings.prayerNotifications,
+                      style: const TextStyle(
                           color: MinarTheme.textPrimary, fontSize: 14)),
-                  subtitle: const Text(
-                    'Subtle reminder banner at prayer times',
+                  subtitle: Text(
+                    c.strings.prayerNotificationsCaption,
                     style:
-                        TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
+                        const TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
                   ),
                   value: c.notificationsEnabled,
                   activeColor: MinarTheme.goldWarm,
@@ -855,13 +883,13 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 ),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Pinned Shade Notification',
-                      style: TextStyle(
+                  title: Text(c.strings.pinnedShadeNotification,
+                      style: const TextStyle(
                           color: MinarTheme.textPrimary, fontSize: 14)),
-                  subtitle: const Text(
-                    'Persistent prayer times in shade • 0% background battery',
+                  subtitle: Text(
+                    c.strings.pinnedShadeCaption,
                     style:
-                        TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
+                        const TextStyle(color: MinarTheme.textSecondary, fontSize: 11),
                   ),
                   value: c.pinnedNotificationEnabled,
                   activeColor: MinarTheme.goldWarm,
@@ -1348,6 +1376,32 @@ class _SettingsSheetState extends State<SettingsSheet> {
 ),
 );
       },
+    );
+  }
+
+  Widget _buildLanguageChip(String label, String code, PrayerController c) {
+    final isSelected = c.appLanguage == code;
+    return GestureDetector(
+      onTap: () => c.setAppLanguage(code),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? MinarTheme.goldWarm : MinarTheme.surfaceSubtle,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? MinarTheme.goldLight : MinarTheme.borderFaint,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF090E18) : MinarTheme.textPrimary,
+            fontSize: 12.5,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
     );
   }
 

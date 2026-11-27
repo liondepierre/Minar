@@ -4,6 +4,7 @@ import '../models/calculation_method.dart';
 import '../models/prayer_schedule.dart';
 import '../models/prayer_type.dart';
 import '../models/weekly_schedule.dart';
+import '../l10n/app_strings.dart';
 import '../services/aladhan_service.dart';
 import '../services/diyanet_service.dart';
 import '../services/geocoding_service.dart';
@@ -533,6 +534,19 @@ class PrayerController extends ChangeNotifier {
     MinarTheme.applyTheme(theme: appTheme, accent: accent);
     notifyListeners();
   }
+
+  String get appLanguage => _storage.appLanguage;
+
+  void setAppLanguage(String lang) {
+    if (_storage.appLanguage == lang) return;
+    _storage.appLanguage = lang;
+    if (lang == 'tr') {
+      _storage.useTurkishNames = true;
+    }
+    notifyListeners();
+  }
+
+  AppStrings get strings => AppStrings.get(appLanguage);
 
   Future<void> syncWidgets() async {
     if (_schedule == null) return;

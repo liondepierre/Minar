@@ -25,6 +25,7 @@ class StorageService {
   static const String _kWidgetTextSize = 'minar_widget_text_size';
   static const String _kAppTheme = 'minar_app_theme';
   static const String _kAppAccent = 'minar_app_accent';
+  static const String _kAppLanguage = 'minar_app_language';
 
   final SharedPreferences _prefs;
 
@@ -149,4 +150,8 @@ class StorageService {
   /// App accent: 'gold', 'emerald', 'white', 'blue', 'rose'
   String get appAccent => _prefs.getString(_kAppAccent) ?? 'gold';
   set appAccent(String value) => _prefs.setString(_kAppAccent, value);
+
+  /// App language: 'en', 'tr', 'da', 'de', 'ar'
+  String get appLanguage => _prefs.getString(_kAppLanguage) ?? 'en';
+  set appLanguage(String value) => _prefs.setString(_kAppLanguage, value);
 }

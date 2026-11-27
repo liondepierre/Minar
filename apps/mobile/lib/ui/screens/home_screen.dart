@@ -51,9 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _formatDayLabel(int index, DateTime? dt) {
-    if (index == 0) return 'Today';
-    if (index == 1) return 'Tomorrow';
+  String _formatDayLabel(int index, DateTime? dt, PrayerController c) {
+    if (index == 0) return c.strings.today;
+    if (index == 1) return c.strings.tomorrow;
     if (dt != null) {
       final wd = _weekdays[dt.weekday - 1];
       return '$wd ${dt.day}';
@@ -281,6 +281,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               nextPrayer: nextPrayer,
                               useTurkish: c.useTurkish,
                               zoomEnhanced: c.zoomEnhanced,
+                              nextPrayerLabel: nextPrayer != null
+                                  ? (nextPrayer.isTomorrowFajr
+                                      ? c.strings.tomorrowFajr
+                                      : c.strings.nextPrayer)
+                                  : null,
                             ),
 
                             const SizedBox(height: 22),
@@ -292,10 +297,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   c.selectedDayIndex == 0
-                                      ? "TODAY'S SCHEDULE"
+                                      ? c.strings.todaySchedule
                                       : (c.selectedDayIndex == 1
-                                          ? "TOMORROW'S SCHEDULE"
-                                          : "${_formatDayLabel(c.selectedDayIndex, weekly?.days[c.selectedDayIndex].items.firstOrNull?.dateTime).toUpperCase()} SCHEDULE"),
+                                          ? c.strings.tomorrowSchedule
+                                          : "${_formatDayLabel(c.selectedDayIndex, weekly?.days[c.selectedDayIndex].items.firstOrNull?.dateTime, c).toUpperCase()} SCHEDULE"),
                                   style: const TextStyle(
                                     color: MinarTheme.sectionHeader,
                                     fontSize: 11,
@@ -307,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        'Swipe days',
+                                        c.strings.swipeDays,
                                         style: TextStyle(
                                           color: MinarTheme.goldWarm.withOpacity(0.7),
                                           fontSize: 11,
@@ -343,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     final daySchedule = weekly!.days[index];
                                     final dt = daySchedule
                                         .items.firstOrNull?.dateTime;
-                                    final label = _formatDayLabel(index, dt);
+                                    final label = _formatDayLabel(index, dt, c);
 
                                     return GestureDetector(
                                       onTap: () {

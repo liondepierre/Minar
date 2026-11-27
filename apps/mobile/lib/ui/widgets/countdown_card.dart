@@ -6,12 +6,14 @@ class CountdownCard extends StatelessWidget {
   final NextPrayer? nextPrayer;
   final bool useTurkish;
   final bool zoomEnhanced;
+  final String? nextPrayerLabel;
 
   const CountdownCard({
     super.key,
     required this.nextPrayer,
     required this.useTurkish,
     this.zoomEnhanced = false,
+    this.nextPrayerLabel,
   });
 
   @override
@@ -59,9 +61,10 @@ class CountdownCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    nextPrayer!.isTomorrowFajr
-                        ? 'TOMORROW FAJR'
-                        : 'NEXT PRAYER',
+                    nextPrayerLabel ??
+                        (nextPrayer!.isTomorrowFajr
+                            ? 'TOMORROW FAJR'
+                            : 'NEXT PRAYER'),
                     style: const TextStyle(
                       color: MinarTheme.sectionHeader,
                       fontSize: 11,
